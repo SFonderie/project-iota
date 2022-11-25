@@ -3,8 +3,8 @@
 UCompositeValue::UCompositeValue()
 {
 	// Default constructor.
-	// Required to ensure that composites can be created in the editor.
 }
+
 
 //
 // LISTENERS
@@ -12,7 +12,7 @@ UCompositeValue::UCompositeValue()
 
 void UCompositeValue::AddListener(UCompositeValue* Listener)
 {
-	int32* Count = Listeners.Find(Listener);
+	uint8* Count = Listeners.Find(Listener);
 
 	if (Count)
 	{
@@ -25,7 +25,7 @@ void UCompositeValue::AddListener(UCompositeValue* Listener)
 
 void UCompositeValue::RemoveListener(UCompositeValue* Listener)
 {
-	int32* Count = Listeners.Find(Listener);
+	uint8* Count = Listeners.Find(Listener);
 
 	if (Count)
 	{
@@ -38,6 +38,12 @@ void UCompositeValue::RemoveListener(UCompositeValue* Listener)
 		Listeners.Remove(Listener);
 	}
 }
+
+const TMap<UCompositeValue*, uint8>& UCompositeValue::GetListeners() const
+{
+	return Listeners;
+}
+
 
 //
 // BASE VALUES
@@ -101,42 +107,54 @@ void UCompositeValue::MakeBasePointer(UCompositeValue* Pointer)
 	SetPointerBase(Pointer);
 }
 
+
 //
 // TRANSFORM
 //
 
-const FCompositeTransform& UCompositeValue::GetTransform() const
+void UCompositeValue::DefineTransform(const FCompositeTransform& Function)
 {
-	return TransformFunction;
+	SetTransform(Function);
 }
 
-void UCompositeValue::SetTransform(const FCompositeTransform& Transform)
+const FCompositeTransform& UCompositeValue::GetTransform() const
 {
-	TransformFunction = Transform;
+	return Transform;
+}
+
+void UCompositeValue::SetTransform(const FCompositeTransform& Function)
+{
+	Transform = Function;
 	MarkDirty();
 }
+
 
 //
 // MODIFIERS
 //
 
-bool UCompositeValue::RemoverPredicate(const FCompositeModifier& Modifier, bool PredicateResult)
+bool UCompositeValue::DelinkerPredicate(const FCompositeModifier& Modifier, bool bPredicate)
 {
-	if (PredicateResult && Modifier.PointerValue)
+	if (bPredicate && Modifier.PointerValue)
 	{
 		Modifier.PointerValue->RemoveListener(this);
 	}
 
-	return PredicateResult;
+	return bPredicate;
+}
+
+const TArray<FCompositeModifier>& UCompositeValue::GetModifiers() const
+{
+	return Modifiers;
 }
 
 void UCompositeValue::DefineMask(int32 Mask)
 {
-	ModifierMask = (ECompositeModifier)Mask;
+	ModifierMask = (ECompositeModifier) Mask;
 
-	int32 Count = Modifiers.RemoveAll([this](FCompositeModifier& Modifier)
+	int32 Count = Modifiers.RemoveAll([&](const FCompositeModifier& Modifier)
 	{
-		return RemoverPredicate(Modifier, (Modifier.Type & ModifierMask) != ECompositeModifier::None);
+		return DelinkerPredicate(Modifier, (Modifier.Type & ModifierMask) != ECompositeModifier::None);
 	});
 
 	if (Count > 0)
@@ -164,9 +182,9 @@ bool UCompositeValue::AddModifier(const FCompositeModifier& Modifier)
 
 bool UCompositeValue::RemoveModifiers(const FName& Source)
 {
-	int32 Count = Modifiers.RemoveAll([this, Source](FCompositeModifier& Modifier)
+	int32 Count = Modifiers.RemoveAll([&](const FCompositeModifier& Modifier)
 	{
-		return RemoverPredicate(Modifier, Modifier.Source == Source);
+		return DelinkerPredicate(Modifier, Modifier.Source == Source);
 	});
 
 	if (Count > 0)
@@ -179,84 +197,61 @@ bool UCompositeValue::RemoveModifiers(const FName& Source)
 
 void UCompositeValue::ClearModifiers()
 {
-	for (FCompositeModifier& Modifier : Modifiers)
+	int32 Count = Modifiers.RemoveAll([&](const FCompositeModifier& Modifier)
 	{
-		if (Modifier.PointerValue)
-		{
-			Modifier.PointerValue->RemoveListener(this);
-		}
-	}
+		return DelinkerPredicate(Modifier, Modifier.Source != FCompositeModifier::IntrinsicSource);
+	});
 
-	Modifiers.Empty();
-	MarkDirty();
+	if (Count > 0)
+	{
+		MarkDirty();
+	}
 }
+
 
 //
-// PARAMETERS
+// BOUNDS
 //
 
-void UCompositeValue::MarkDirty()
+void UCompositeValue::DefineBounds(const FCompositeBounds& Limit)
 {
-	if (IsDirty)
-	{
-		return;
-	}
-
-	IsDirty = true;
-
-	for (TPair<UCompositeValue*, int32>& Listener : Listeners)
-	{
-		Listener.Key->MarkDirty();
-	}
+	SetBounds(Limit);
 }
 
-ECompositeBounds UCompositeValue::GetBoundsType() const
+const FCompositeBounds& UCompositeValue::GetBounds() const
 {
-	return BoundsType;
+	return Bounds;
 }
 
-float UCompositeValue::GetLowerBound() const
+void UCompositeValue::SetBounds(const FCompositeBounds& Limit)
 {
-	return LowerBound;
-}
-
-float UCompositeValue::GetUpperBound() const
-{
-	return UpperBound;
-}
-
-void UCompositeValue::SetBoundsType(ECompositeBounds Bounds)
-{
-	BoundsType = Bounds;
+	Bounds = Limit;
 	MarkDirty();
 }
 
-void UCompositeValue::SetLowerBound(float Lower)
-{
-	LowerBound = Lower;
-	MarkDirty();
-}
-
-void UCompositeValue::SetUpperBound(float Upper)
-{
-	UpperBound = Upper;
-	MarkDirty();
-}
-
-void UCompositeValue::DefineBounds(ECompositeBounds Bounds, float Upper, float Lower)
-{
-	SetBoundsType(Bounds);
-	SetLowerBound(Lower);
-	SetUpperBound(Upper);
-}
 
 //
 // CALCULATION
 //
 
+void UCompositeValue::MarkDirty()
+{
+	if (bDirty)
+	{
+		return;
+	}
+
+	bDirty = true;
+
+	for (const TPair<UCompositeValue*, uint8>& Listener : Listeners)
+	{
+		Listener.Key->MarkDirty();
+	}
+}
+
 void UCompositeValue::Calculate()
 {
-	Value = TransformFunction.Evaluate(GetBaseValue());
+	Value = Transform.Evaluate(GetBaseValue());
 
 	float PercentSum = 1;
 	float InverseSum = 1;
@@ -266,7 +261,7 @@ void UCompositeValue::Calculate()
 		return (A.Order == B.Order) ? (A.Type < B.Type) : (A.Order < B.Order);
 	});
 
-	auto UpdateSums = [this, &PercentSum, &InverseSum]()
+	auto UpdateSums = [&]()
 	{
 		Value *= PercentSum;
 		Value /= InverseSum;
@@ -333,59 +328,12 @@ void UCompositeValue::Calculate()
 
 	UpdateSums();
 
-	switch (BoundsType)
-	{
-		case ECompositeBounds::Minimum:
-		{
-			if (Value < LowerBound)
-			{
-				Value = LowerBound;
-			}
-
-			break;
-		}
-		case ECompositeBounds::Maximum:
-		{
-			if (Value > UpperBound)
-			{
-				Value = UpperBound;
-			}
-
-			break;
-		}
-		case ECompositeBounds::Interval:
-		{
-			if (Value < LowerBound)
-			{
-				Value = LowerBound;
-			}
-
-			if (Value > UpperBound)
-			{
-				Value = UpperBound;
-			}
-
-			break;
-		}
-		case ECompositeBounds::Exclusion:
-		{
-			if (Value < LowerBound && Value > UpperBound)
-			{
-				Value = UpperBound;
-			}
-
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
+	Value = Bounds.Clamp(Value);
 }
 
 float UCompositeValue::GetValue()
 {
-	if (IsDirty)
+	if (bDirty)
 	{
 		Calculate();
 	}

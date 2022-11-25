@@ -2,13 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Composite.h"
 #include "CompositeLibrary.generated.h"
 
-// Forward declarations.
-class UCompositeValue;
-struct FCompositeModifier;
 
-// Library of additional functions
+/// Provides additional composite behaviors for use in the editor.
 UCLASS()
 class COMPOSITE_API UCompositeLibrary : public UBlueprintFunctionLibrary
 {
@@ -16,7 +14,7 @@ class COMPOSITE_API UCompositeLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	// Casts a Composite Value to a float by extracting its value.
-	UFUNCTION(BlueprintPure, meta = (BlueprintAutocast, CompactNodeTitle = "->", DisplayName = "To Float (Composite Modifier)"))
+	/// Converts a Composite Value to a float by extracting its calculated value.
+	UFUNCTION(BlueprintPure, meta = (BlueprintAutocast, CompactNodeTitle = "->", DisplayName = "To Float (Composite Value)"))
 	static float Conv_CompositeValueToFloat(UCompositeValue* Composite);
 };

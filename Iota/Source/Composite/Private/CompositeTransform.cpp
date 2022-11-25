@@ -1,8 +1,26 @@
 #include "CompositeTransform.h"
 
+
+FCompositeTransform::FCompositeTransform()
+{
+	// Default constructor.
+}
+
+FCompositeTransform::FCompositeTransform(ECompositeTransform Function, float Leading, float Scale) :
+	Function(Function), Leading(Leading), Scale(Scale)
+{
+	// Scalar constructor.
+}
+
+FCompositeTransform::FCompositeTransform(ECompositeTransform Function, float Leading, float Scale, float Shift, float Constant) :
+	Function(Function), Leading(Leading), Scale(Scale), Shift(Shift), Constant(Constant)
+{
+	// Complete constructor.
+}
+
 float FCompositeTransform::Evaluate(float Value) const
 {
-	switch (Type)
+	switch (Function)
 	{
 		case ECompositeTransform::Linear:
 		{
@@ -49,8 +67,8 @@ float FCompositeTransform::Evaluate(float Value) const
 		}
 		case ECompositeTransform::Sigmoid:
 		{
-			float Factor = Scale * (Value - Shift);
-			return Leading * (Factor / (FMath::Abs(Factor) + 1)) + Constant;
+			float Inner = Scale * (Value - Shift);
+			return Leading * (Inner / (FMath::Abs(Inner) + 1)) + Constant;
 		}
 		default:
 		{

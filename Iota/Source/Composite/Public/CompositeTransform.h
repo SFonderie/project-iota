@@ -3,52 +3,56 @@
 #include "CoreMinimal.h"
 #include "CompositeTransform.generated.h"
 
-// Standard composite transformation types.
-UENUM()
+
+/// Indicates which function a Composite Transform should use.
+UENUM(meta = (ScriptName = "CompositeTransformFunction"))
 enum class ECompositeTransform : uint8
 {
-	// Skip transformation.
+	/// Does not apply a transformation.
 	None,
 
-	// Linear transformation.
+	/// Applies a linear transformation.
 	Linear,
 
-	// Square transformation.
+	/// Applies a square transformation.
 	Square,
 
-	// Square root transformation. 
-	// Defined for all real numbers via an absolute value.
+	/// Applies a square-root transformation.
+	/// Supports negative inputs via the absolute value.
 	SquareRoot,
 
-	// Inverse transformation.
+	/// Applies an inverse transformation.
 	Inverse,
 
-	// Inverse square transformation.
+	/// Applies an inverse-square transformation.
 	InverseSquare,
 
-	// Inverse square root transformation.
-	// Defined for all real numbers except 0 via an absolute value.
+	/// Applies an inverse-square-root transformation.
+	/// Supports negative inputs via the absolute value.
 	InverseSquareRoot,
 
-	// Exponential transformation.
+	/// Applies an exponential transformation.
 	Exponential,
 
-	// Logarithmic transformation.
-	// Defined for all real numbers except 0 via an absolute value.
+	/// Applies a logarithmic transformation.
+	/// Supports negative inputs via the absolute value.
 	Logarithmic,
 
-	// Sine transformation.
+	/// Applies a sine-wave transformation.
 	Sine,
 
-	// Cosine transformation.
+	/// Applies a cosine-wave transformation.
 	Cosine,
 
-	// Sigmoid transformation.
-	// Calculates using the inverse absolute sigmoid curve.
+	/// Applies a sigmoid transformation.
+	/// Uses the simple algebraic sigmoid for calculations.
 	Sigmoid,
 };
 
-// Applies a transformation to a Composite Value before applying modifiers.
+
+/// Represents a parameteric transform function for use with a Composite Value.
+/// Normally applies to the composite's base value before any modifiers are applied.
+/// Composite Transforms are always functions of the form [ k D ( at - ab ) + C ]
 USTRUCT(BlueprintType)
 struct COMPOSITE_API FCompositeTransform
 {
@@ -56,28 +60,49 @@ struct COMPOSITE_API FCompositeTransform
 
 public:
 
-	// Determines the transformation function D in [ k D ( at + ab ) + C ]
+	/// Determines the transform function D in [ k D ( at + ab ) + C ]
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ECompositeTransform Type = ECompositeTransform::None;
+	ECompositeTransform Function = ECompositeTransform::None;
 
-	// Value of the leading coefficient k in [ k D ( at + ab ) + C ]
+	/// Value of the leading coefficient k in [ k D ( at + ab ) + C ]
+	/// Stretches or compresses the transform range by a factor equal to itself.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Leading = 1;
 
-	// Value of the scale coefficient a in [ k D ( at + ab ) + C ]
+	/// Value of the scale coefficient a in [ k D ( at + ab ) + C ]
+	/// Compresses or stretches the transform domain by a factor equal to itself.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Scale = 1;
 
-	// Value of the shift coefficient b in [ k D ( at - ab ) + C ]
+	/// Value of the shift coefficient b in [ k D ( at - ab ) + C ]
+	/// Shifts the transform domain right or left by an amount equal to itself.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Shift = 0;
 
-	// Value of the constant coefficient C in [ k D ( at + ab ) + C ]
+	/// Value of the constant coefficient C in [ k D ( at + ab ) + C ]
+	/// Shifts the transform range up or down by an amount equal to itself.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Constant = 0;
 
 public:
 
-	// Evaluates the transform at the given value.
+	/// Default constructor. Defines a blank function with default parameters.
+	FCompositeTransform();
+
+	/// Scalar constructor. Defines a function with only multiplicative parameters.
+	/// @param Function Transform function to use.
+	/// @param Leading Leading coefficient; stretches or compresses the transform range by a factor equal to itself.
+	/// @param Scale Scale coefficient; compresses or stretches the transform domain by a factor equal to itself.
+	FCompositeTransform(ECompositeTransform Function, float Leading, float Scale);
+
+	/// Complete constructor. Defines a function with all parameters.
+	/// @param Function Transform function to use.
+	/// @param Leading Leading coefficient; stretches or compresses the transform range by a factor equal to itself.
+	/// @param Scale Scale coefficient; compresses or stretches the transform domain by a factor equal to itself.
+	/// @param Shift Shift coefficient; shifts the transform domain right or left by an amount equal to itself.
+	/// @param Constant Constant coefficient; shifts the transform range up or down by an amount equal to itself.
+	FCompositeTransform(ECompositeTransform Function, float Leading, float Scale, float Shift, float Constant);
+
+	/// Evaluates the transform function at the given value.
 	float Evaluate(float Value) const;
 };
