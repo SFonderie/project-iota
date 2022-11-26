@@ -12,6 +12,11 @@ UCompositeValue::UCompositeValue()
 
 void UCompositeValue::AddListener(UCompositeValue* Listener)
 {
+	if (!Listener)
+	{
+		return;
+	}
+
 	uint8* Count = Listeners.Find(Listener);
 
 	if (Count)
@@ -25,6 +30,11 @@ void UCompositeValue::AddListener(UCompositeValue* Listener)
 
 void UCompositeValue::RemoveListener(UCompositeValue* Listener)
 {
+	if (!Listener)
+	{
+		return;
+	}
+
 	uint8* Count = Listeners.Find(Listener);
 
 	if (Count)

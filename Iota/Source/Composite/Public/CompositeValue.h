@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "CompositeTransform.h"
-#include "CompositeModifier.h"
 #include "CompositeBounds.h"
+#include "CompositeModifier.h"
+#include "CompositeTransform.h"
 #include "CompositeValue.generated.h"
 
 
