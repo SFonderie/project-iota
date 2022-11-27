@@ -13,7 +13,7 @@
 			]
 		},
 		{
-			"Name": "Composite",
+			"Name": "ActorContext",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
