@@ -1,3 +1,9 @@
+# User configuration files
+DefaultEditorPerProjectUserSettings.ini
+
+# Unnecessary configuration files
+Platforms/HoloLens/*
+
 # Visual Studio 2015 user specific files
 .vs/
 
@@ -72,6 +78,3 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-
-# Unnecessary Platform Configuration files
-Platforms/HoloLens/*
