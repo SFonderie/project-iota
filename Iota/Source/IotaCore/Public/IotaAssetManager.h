@@ -4,14 +4,9 @@
 #include "Engine/AssetManager.h"
 #include "IotaAssetManager.generated.h"
 
-/** Asset Manager that provides additional load functionality. */
+/** Generates global libraries for game-relevant data assets. */
 UCLASS()
 class IOTACORE_API UIotaAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
-
-public:
-
-	/** Ensures that the Ability System Globals object is properly initialized. */
-	virtual void StartInitialLoading() override;
 };
