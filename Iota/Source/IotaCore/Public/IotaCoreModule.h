@@ -27,5 +27,5 @@ private:
 	void InitializeAbilitySystem();
 
 	/** Handle for InitializeAbilitySystem on FCoreDelegates::OnPostEngineInit. */
-	FDelegateHandle InitializeAbilitySystemHandle;
+	FDelegateHandle AbilitySystemDelegateHandle;
 };
