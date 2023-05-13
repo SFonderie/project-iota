@@ -12,7 +12,7 @@ void FIotaCoreModule::StartupModule()
 
 void FIotaCoreModule::ShutdownModule()
 {
-	// AddRaw means that IotaCore must remove the delegate binding itself.
+	// AddRaw means that we must remove the delegate binding ourselves.
 	FCoreDelegates::OnPostEngineInit.Remove(AbilitySystemDelegateHandle);
 }
 
