@@ -1,3 +1,5 @@
+// Copyright Sydney Fonderie, 2023. All Rights Reserved.
+
 using UnrealBuildTool;
 
 public class IotaCore : ModuleRules

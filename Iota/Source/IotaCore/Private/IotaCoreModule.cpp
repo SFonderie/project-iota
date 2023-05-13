@@ -1,3 +1,5 @@
+// Copyright Sydney Fonderie, 2023. All Rights Reserved.
+
 #include "IotaCoreModule.h"
 #include "Misc/CoreDelegates.h"
 #include "Modules/ModuleManager.h"

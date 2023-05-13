@@ -2,13 +2,13 @@
 
 using UnrealBuildTool;
 
-public class IotaEditorTarget : TargetRules
+public class IotaGameTarget : TargetRules
 {
-	public IotaEditorTarget(TargetInfo Target) : base(Target)
+	public IotaGameTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Editor;
+		Type = TargetType.Game;
 
-		// Enforce Include-What-You-Use
+		// Include-What-You-Use
 		bUseUnityBuild = false;
 		bUsePCHFiles = false;
 
