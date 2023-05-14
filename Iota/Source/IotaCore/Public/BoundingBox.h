@@ -52,34 +52,30 @@ public:
 		return Rotation.RotateVector(FVector::UpVector);
 	}
 
-	/**
-	 * Performs a collision check between two oriented bounding boxes via the Separating Axis Theorem.
-	 *
-	 * @param BoxA The first oriented bounding box to check.
-	 * @param BoxB The second oriented bounding box to check.
-	 * @return Whether the two boxes are colliding.
-	 */
-	static bool CheckSeparatingAxes(const FBoundingBox& BoxA, const FBoundingBox& BoxB);
+	/** Performs a collision check against the given box. */
+	bool IsCollidingWith(const FBoundingBox& Collider) const
+	{
+		return FBoundingBox::CheckSeparatingAxes(*this, Collider);
+	}
 
 private:
 
+	/** Performs a collision check between two oriented bounding boxes via the Separating Axis Theorem. */
+	static bool CheckSeparatingAxes(const FBoundingBox& BoxA, const FBoundingBox& BoxB);
+
 	/**
-	 * Projects the two boxes along the given axis and checks for an overlap. If the two intervals
-	 * do not overlap, then the axis is a separating axis.
-	 *
-	 * @param BoxA The first oriented bounding box to check.
-	 * @param BoxB The second oriented bounding box to check.
-	 * @param Axis Characteristic vector of the projection axis.
-	 * @return Whether the axis is a separating axis.
+	 * Projects two bounding boxes along a test axis and checks for an overlap. If the two intervals
+	 * do not overlap, then the axis is a separating axis and the method will return true.
 	 */
 	static bool TestSeparatingAxis(const FBoundingBox& BoxA, const FBoundingBox& BoxB, const FVector& Axis);
 
-	/** Returns the projection interval of the box along the given axis. */
-	FFloatInterval GetLineProjection(const FVector& Axis) const;
+	/** Projects the bounding box along the given axis and returns the result as a float interval. */
+	FFloatInterval MakeLineProjection(const FVector& Axis) const;
 
-	/** Loads the three cardinal axes into the given array buffer. */
-	void GetAxesBuffer(TArray<FVector>& OutAxesBuffer) const
+	/** Fills the given array with the three box axes. */
+	void LoadAxesBuffer(TArray<FVector>& OutAxesBuffer) const
 	{
+		OutAxesBuffer.Empty(3);
 		OutAxesBuffer.Emplace(GetAxisX());
 		OutAxesBuffer.Emplace(GetAxisY());
 		OutAxesBuffer.Emplace(GetAxisZ());

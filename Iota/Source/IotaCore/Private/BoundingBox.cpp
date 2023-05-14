@@ -21,7 +21,7 @@ FBoundingBox::FBoundingBox(const FBoundingBox& SourceBox, const FTransform& Tran
 	, Rotation(Transform.TransformRotation(SourceBox.Rotation.Quaternion()).Rotator())
 	, Extent(Transform.GetScale3D()* SourceBox.Extent)
 {
-	// Copy constructor (with transform).
+	// Copy constructor.
 }
 
 bool FBoundingBox::CheckSeparatingAxes(const FBoundingBox& BoxA, const FBoundingBox& BoxB)
@@ -29,8 +29,8 @@ bool FBoundingBox::CheckSeparatingAxes(const FBoundingBox& BoxA, const FBounding
 	TArray<FVector> AxesBufferA, AxesBufferB;
 
 	// Load the coordinate axes.
-	BoxA.GetAxesBuffer(AxesBufferA);
-	BoxB.GetAxesBuffer(AxesBufferB);
+	BoxA.LoadAxesBuffer(AxesBufferA);
+	BoxB.LoadAxesBuffer(AxesBufferB);
 
 	// Box A - Test all face normals.
 	for (const FVector& Axis : AxesBufferA)
@@ -72,15 +72,15 @@ bool FBoundingBox::TestSeparatingAxis(const FBoundingBox& BoxA, const FBoundingB
 		return false;
 	}
 
-	FFloatInterval IntervalA = BoxA.GetLineProjection(Axis);
-	FFloatInterval IntervalB = BoxB.GetLineProjection(Axis);
+	FFloatInterval IntervalA = BoxA.MakeLineProjection(Axis);
+	FFloatInterval IntervalB = BoxB.MakeLineProjection(Axis);
 
 	// If either bound of B is inside of A, then the two intervals must overlap and
 	// therefore the axis is not a valid separating axis.
 	return !IntervalA.Contains(IntervalB.Min) && !IntervalA.Contains(IntervalB.Max);
 }
 
-FFloatInterval FBoundingBox::GetLineProjection(const FVector& Axis) const
+FFloatInterval FBoundingBox::MakeLineProjection(const FVector& Axis) const
 {
 	// Projection becomes much cleaner when the target vector is normalized.
 	const FVector UnitAxis = Axis.IsNormalized() ? Axis : Axis.GetUnsafeNormal();

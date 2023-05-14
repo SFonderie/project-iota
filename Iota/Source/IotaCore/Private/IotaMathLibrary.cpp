@@ -17,5 +17,5 @@ FBoundingBox UIotaMathLibrary::TransformBoundingBox(const FBoundingBox& SourceBo
 
 bool UIotaMathLibrary::CheckBoxCollision(const FBoundingBox& BoxA, const FBoundingBox& BoxB)
 {
-	return FBoundingBox::CheckSeparatingAxes(BoxA, BoxB);
+	return BoxA.IsCollidingWith(BoxB);
 }
