@@ -8,6 +8,7 @@
 
 // Forward declarations.
 struct FBoundingBox;
+class UBoxComponent;
 
 /** Provides additional math utilities for IotaCore. */
 UCLASS()
@@ -27,6 +28,15 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Math|BoundingBox")
 	static void GetBoundingBoxAxes(const FBoundingBox& Box, FVector& AxisX, FVector& AxisY, FVector& AxisZ);
+
+	/**
+	 * Creates a bounding box representing the given component in world space.
+	 *
+	 * @param BoxComponent Box Component from which to construct a bounding box.
+	 * @return The Box Component as a world-space bounding box structure.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Math|BoundingBox")
+	static FBoundingBox FromBoxComponent(const UBoxComponent* BoxComponent);
 
 	/**
 	 * Transforms and returns the bounding box into the given coordinate space.

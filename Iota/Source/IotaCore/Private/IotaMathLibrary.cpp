@@ -10,6 +10,11 @@ void UIotaMathLibrary::GetBoundingBoxAxes(const FBoundingBox& Box, FVector& Axis
 	AxisZ = Box.GetAxisZ();
 }
 
+FBoundingBox UIotaMathLibrary::FromBoxComponent(const UBoxComponent* BoxComponent)
+{
+	return FBoundingBox(BoxComponent);
+}
+
 FBoundingBox UIotaMathLibrary::TransformBoundingBox(const FBoundingBox& SourceBox, const FTransform& Transform)
 {
 	return FBoundingBox(SourceBox, Transform);

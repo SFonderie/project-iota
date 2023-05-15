@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "BoundingBox.generated.h"
 
+// Forward declarations.
+class UBoxComponent;
+
 /** Simple implementation of an oriented bounding box. */
 USTRUCT(BlueprintType)
 struct IOTACORE_API FBoundingBox
@@ -33,6 +36,9 @@ public:
 
 	/** Copy constructor; duplicates the given bounding box and optionally transforms it. */
 	FBoundingBox(const FBoundingBox& SourceBox, const FTransform& Transform = FTransform::Identity);
+
+	/** Box constructor; creates a bounding box from a component. */
+	FBoundingBox(const UBoxComponent* BoxComponent);
 
 	/** Returns the bounding box forward vector in world space. */
 	FVector GetAxisX() const

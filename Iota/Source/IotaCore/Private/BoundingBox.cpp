@@ -1,6 +1,7 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "BoundingBox.h"
+#include "Components/BoxComponent.h"
 
 FBoundingBox::FBoundingBox()
 	: Extent(FVector::OneVector * 50)
@@ -22,6 +23,14 @@ FBoundingBox::FBoundingBox(const FBoundingBox& SourceBox, const FTransform& Tran
 	, Extent(Transform.GetScale3D()* SourceBox.Extent)
 {
 	// Copy constructor.
+}
+
+FBoundingBox::FBoundingBox(const UBoxComponent* BoxComponent)
+	: Center(BoxComponent->GetComponentLocation())
+	, Rotation(BoxComponent->GetComponentRotation())
+	, Extent(BoxComponent->GetScaledBoxExtent())
+{
+	// Box constructor.
 }
 
 bool FBoundingBox::CheckSeparatingAxes(const FBoundingBox& BoxA, const FBoundingBox& BoxB)
