@@ -28,7 +28,7 @@ FTilePortal::FTilePortal(const FTilePortal& TilePortal, const FTransform& Transf
 	// Copy constructor.
 }
 
-FTransform FTilePortal::TileToWorldTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
+FTransform FTilePortal::ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
 {
 	// Make a tile-to-portal transform by inverting the tile portal's transform.
 	// We also need to flip the direction so that the portal faces the other way.

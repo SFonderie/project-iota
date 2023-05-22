@@ -16,5 +16,10 @@ FTileBound UTileLibrary::TransformTileBound(const FTileBound& TileBound, const F
 
 FTransform UTileLibrary::ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
 {
-	return FTilePortal::TileToWorldTransform(TilePortal, WorldPortal);
+	return FTilePortal::ConnectionTransform(TilePortal, WorldPortal);
+}
+
+FTilePortal UTileLibrary::TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform)
+{
+	return FTilePortal(TilePortal, Transform);
 }

@@ -52,18 +52,6 @@ public:
 	}
 
 	/**
-	 * Calculates the tile-to-world transform needed to position the owning level tile into the 
-	 * world space of the given connection portal.
-	 * 
-	 * @param Connection The world-space tile portal with which to connect.
-	 * @return The tile-to-world transform needed to connect with the given portal.
-	 */
-	FTransform GetTransformThrough(const FTilePortal& Connection) const
-	{
-		return TileToWorldTransform(*this, Connection);
-	}
-
-	/**
 	 * Calculates the transform needed to position a level tile into a generated world through the
 	 * connection between the given tile portals.
 	 * 
@@ -71,5 +59,5 @@ public:
 	 * @param WorldPortal Connection portal from the world.
 	 * @return The level-tile-to-world transform.
 	 */
-	static FTransform TileToWorldTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal);
+	static FTransform ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal);
 };

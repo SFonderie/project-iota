@@ -46,4 +46,14 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "Tile|TilePortal")
 	static FTransform ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal);
+
+	/**
+	 * Transforms the given tile portal and returns the result.
+	 *
+	 * @param TilePortal Tile portal to transform.
+	 * @param Transform Transform to apply to the tile portal.
+	 * @return Transformed tile portal.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Tile|TilePortal")
+	static FTilePortal TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform);
 };
