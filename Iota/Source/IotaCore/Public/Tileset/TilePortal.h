@@ -46,15 +46,15 @@ public:
 	FTilePortal(const FTilePortal& TilePortal, const FTransform& Transform = FTransform::Identity);
 
 	/** @return True if the portals have the same plane size. */
-	bool operator==(const FTilePortal& Other) const
+	bool CanConnect(const FTilePortal& Connection) const
 	{
-		return PlaneSize == Other.PlaneSize;
+		return PlaneSize == Connection.PlaneSize;
 	}
 
 	/**
 	 * Calculates the transform needed to position a level tile into a generated world through the
 	 * connection between the given tile portals.
-	 * 
+	 *
 	 * @param TilePortal Connection portal from the level tile.
 	 * @param WorldPortal Connection portal from the world.
 	 * @return The level-tile-to-world transform.

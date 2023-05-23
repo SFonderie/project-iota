@@ -16,8 +16,8 @@ ATilePortalActor::ATilePortalActor()
 
 	// Portal plane component is a box component with a collapsed extent.
 	PlaneComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("PlaneExtent"));
-	PlaneComponent->ShapeColor = FColor(0, 255, 255, 255); // REPLACE WITH STATIC CONST
-	PlaneComponent->InitBoxExtent(FVector(0, 150, 150)); // 3x3 Door Default
+	PlaneComponent->ShapeColor = FColor(0, 255, 255, 255);
+	PlaneComponent->InitBoxExtent(FVector(0, 150, 150));
 	PlaneComponent->SetLineThickness(3);
 
 	// Do not use standard collision; the actor only exists as a visual representation.
@@ -65,7 +65,7 @@ ATilePortalActor::ATilePortalActor()
 
 	// Define the arrow component subobject.
 	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>(TEXT("DirectionVector"));
-	ArrowComponent->ArrowColor = FColor(0, 255, 255, 255); // REPLACE WITH STATIC CONST
+	ArrowComponent->ArrowColor = FColor(0, 255, 255, 255);
 	ArrowComponent->bIsScreenSizeScaled = true;
 	ArrowComponent->bTreatAsASprite = true;
 	ArrowComponent->ArrowSize = 0.8f;

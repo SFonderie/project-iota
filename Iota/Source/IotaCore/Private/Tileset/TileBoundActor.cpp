@@ -12,8 +12,8 @@ ATileBoundActor::ATileBoundActor()
 
 	// Define the bounding box subobject.
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoundingBox"));
-	BoxComponent->ShapeColor = FColor(0, 255, 255, 255); // REPLACE WITH STATIC CONST
-	BoxComponent->InitBoxExtent(FVector(50, 50, 50));
+	BoxComponent->ShapeColor = FColor(0, 255, 255, 255);
+	BoxComponent->InitBoxExtent(FVector(200, 200, 200));
 	BoxComponent->SetLineThickness(1);
 
 	// Do not use standard collision; the actor only exists as a visual representation.
