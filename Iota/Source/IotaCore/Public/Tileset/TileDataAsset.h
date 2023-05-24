@@ -74,9 +74,6 @@ public:
 	UPROPERTY(Category = "Description", EditAnywhere)
 	TArray<struct FTileBound> Bounds;
 
-	/** 
-	 * Invoked just before the data asset is saved. Tile Data Asset uses this method to enforce
-	 * data rules, automatically fixing violations and printing the results to the tile data log.
-	 */
-	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
+	/** Validates the tile data asset contents. */
+	void ValidateForSave();
 };
