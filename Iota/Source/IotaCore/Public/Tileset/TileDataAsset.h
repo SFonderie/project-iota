@@ -55,9 +55,6 @@ class IOTACORE_API UTileDataAsset : public UDataAsset
 
 public:
 
-	/** Class logger used to warn users about data overrides. */
-	DECLARE_LOG_CATEGORY_CLASS(LogTileData, Log, All);
-
 	/** Pointer to the actual tile level instance. */
 	UPROPERTY(Category = "Level", EditAnywhere)
 	TSoftObjectPtr<class UWorld> Level;
@@ -73,7 +70,4 @@ public:
 	/** A list of the tile's summary collision bounds. */
 	UPROPERTY(Category = "Description", EditAnywhere)
 	TArray<struct FTileBound> Bounds;
-
-	/** Validates the tile data asset contents. */
-	void ValidateForSave();
 };

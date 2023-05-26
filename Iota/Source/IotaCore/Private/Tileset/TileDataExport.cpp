@@ -80,8 +80,6 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 			DataAsset->Bounds.Emplace(TileBoundActor->GetTileBound());
 		}
 
-		DataAsset->ValidateForSave();
-
 		// Access the data asset's package so we can save it.
 		UPackage* AssetPackage = DataAsset->GetPackage();
 

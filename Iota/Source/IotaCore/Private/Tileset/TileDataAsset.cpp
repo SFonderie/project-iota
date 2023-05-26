@@ -6,10 +6,3 @@
 #include "Engine/World.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileDataAsset)
-
-DEFINE_LOG_CATEGORY_CLASS(UTileDataAsset, LogTileData);
-
-void UTileDataAsset::ValidateForSave()
-{
-
-}
