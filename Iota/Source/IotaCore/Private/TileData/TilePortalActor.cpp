@@ -1,10 +1,11 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "Tileset/TilePortalActor.h"
-#include "UObject/ConstructorHelpers.h"
+#include "TileData/TilePortalActor.h"
+#include "TileData/TilePortal.h"
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/ArrowComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/Texture2D.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TilePortalActor)

@@ -6,42 +6,45 @@
 #include "Engine/DataAsset.h"
 #include "TileDataAsset.generated.h"
 
+struct FTilePortal;
+struct FTileBound;
+
 /** Defines different tile functions within a tileset. */
 UENUM(BlueprintType)
 enum class ETileScheme : uint8
 {
 	/**
-	 * Indicates that the tile should be used as the level start point.
+	 * Indicates that a tile should be used to determine a level spawn point.
 	 * Start tiles must have at least one portal.
 	 */
 	Start,
 
 	/**
-	 * Indicates that the tile should be used to connect other major tiles.
-	 * Connector tiles must have at least two portals.
+	 * Indicates that a tile should be used to bridge between other tiles.
+	 * Connection tiles must have at least two portals.
 	 */
-	Connector,
+	Connection,
 
 	/**
-	 * Indicates that the tile should be used as a major branch or arena.
+	 * Indicates that a tile should be used to branch the level or as an arena.
 	 * Intermediate tiles must have at least three portals.
 	 */
 	Intermediate,
 
 	/**
-	 * Indicates that the tile contains some kind of level objective.
+	 * Indicates that a tile should be used to indicate a level objective.
 	 * Objective tiles must have at least two portals.
 	 */
 	Objective,
 
 	/**
-	 * Indicates that the tile should be used to close-off empty portals.
+	 * Indicates that a tile should be used to seal-off empty portals.
 	 * Stopper tiles can have at most one portal.
 	 */
 	Stopper,
 
 	/**
-	 * Indicates that the tile should be used as the level exit point.
+	 * Indicates that a tile should be used to determine a level end point.
 	 * Exit tiles must have at least one portal.
 	 */
 	Exit,
@@ -57,7 +60,7 @@ public:
 
 	/** Pointer to the actual tile level instance. */
 	UPROPERTY(Category = "Level", EditAnywhere)
-	TSoftObjectPtr<class UWorld> Level;
+	TSoftObjectPtr<UWorld> Level;
 
 	/** Preferred tile scheme. */
 	UPROPERTY(Category = "Level", EditAnywhere)
@@ -65,9 +68,17 @@ public:
 
 	/** A list of the tile's exit portals. */
 	UPROPERTY(Category = "Description", EditAnywhere)
-	TArray<struct FTilePortal> Portals;
+	TArray<FTilePortal> Portals;
 
 	/** A list of the tile's summary collision bounds. */
 	UPROPERTY(Category = "Description", EditAnywhere)
-	TArray<struct FTileBound> Bounds;
+	TArray<FTileBound> Bounds;
+
+private:
+
+	/** Saves the tile data asset to disk. */
+	void SaveAsset();
+
+	// Allows access to Save Asset.
+	friend class ATileDataExport;
 };

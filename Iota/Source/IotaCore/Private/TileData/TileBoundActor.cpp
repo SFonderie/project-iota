@@ -1,6 +1,7 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "Tileset/TileBoundActor.h"
+#include "TileData/TileBoundActor.h"
+#include "TileData/TileBound.h"
 #include "Components/BoxComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileBoundActor)

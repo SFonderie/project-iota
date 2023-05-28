@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tileset/TileBound.h"
 #include "TileBoundActor.generated.h"
+
+struct FTileBound;
+class UBoxComponent;
 
 /** Represents an oriented tile bounding box in the world. */
 UCLASS()
@@ -29,12 +31,12 @@ private:
 
 	/** Box component used to show the tile bound in-editor. */
 	UPROPERTY(BlueprintReadOnly, Category = "TileBound", VisibleAnywhere, meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UBoxComponent> BoxComponent;
+	TObjectPtr<UBoxComponent> BoxComponent;
 
 public:
 
 	/** @return Box component used to show the tile bound in-editor. */
-	class UBoxComponent* GetBoxComponent() const
+	UBoxComponent* GetBoxComponent() const
 	{
 		return BoxComponent;
 	}

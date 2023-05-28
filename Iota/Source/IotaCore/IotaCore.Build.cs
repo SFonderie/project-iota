@@ -15,8 +15,8 @@ public class IotaCore : ModuleRules
 		PublicDependencyModuleNames.Add("Engine");
 
 		// GAMEPLAY MODULES
-		PrivateDependencyModuleNames.Add("GameplayAbilities");
-		PrivateDependencyModuleNames.Add("GameplayTags");
-		PrivateDependencyModuleNames.Add("GameplayTasks");
+		PublicDependencyModuleNames.Add("GameplayAbilities");
+		PublicDependencyModuleNames.Add("GameplayTags");
+		PublicDependencyModuleNames.Add("GameplayTasks");
 	}
 }

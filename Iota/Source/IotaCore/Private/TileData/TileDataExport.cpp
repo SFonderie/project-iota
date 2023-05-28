@@ -1,13 +1,14 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "Tileset/TileDataExport.h"
-#include "Tileset/TilePortalActor.h"
-#include "Tileset/TileBoundActor.h"
-#include "UObject/ConstructorHelpers.h"
-#include "UObject/ObjectSaveContext.h"
-#include "UObject/Package.h"
+#include "TileData/TileDataExport.h"
+#include "TileData/TilePortalActor.h"
+#include "TileData/TilePortal.h"
+#include "TileData/TileBoundActor.h"
+#include "TileData/TileBound.h"
 #include "Components/SceneComponent.h"
 #include "Components/BillboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "UObject/ObjectSaveContext.h"
 #include "Engine/Texture2D.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileDataExport)
@@ -57,13 +58,11 @@ ATileDataExport::ATileDataExport()
 #endif
 }
 
-#if WITH_EDITOR
-
 void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
-	if (DataAsset)
+	if (GIsEditor && DataAsset)
 	{
 		DataAsset->Level = GetWorld();
 		DataAsset->Scheme = PreferredScheme;
@@ -80,21 +79,6 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 			DataAsset->Bounds.Emplace(TileBoundActor->GetTileBound());
 		}
 
-		// Access the data asset's package so we can save it.
-		UPackage* AssetPackage = DataAsset->GetPackage();
-
-		// Extract the data asset's file name on the local disk.
-		FString FileName = FPackageName::LongPackageNameToFilename(
-			AssetPackage->GetName(), 
-			FPackageName::GetAssetPackageExtension()
-		);
-
-		// Attempt to save the package using a standard call.
-		UPackage::SavePackage(
-			AssetPackage, DataAsset, RF_Public | RF_Standalone, *FileName, 
-			GError, nullptr, true, true, SAVE_NoError
-		);
+		DataAsset->SaveAsset();
 	}
 }
-
-#endif

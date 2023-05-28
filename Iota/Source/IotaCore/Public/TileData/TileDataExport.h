@@ -4,8 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tileset/TileDataAsset.h"
+#include "TileData/TileDataAsset.h"
 #include "TileDataExport.generated.h"
+
+class ATilePortalActor;
+class ATileBoundActor;
+class USceneComponent;
+class UBillboardComponent;
 
 /** Exports tile level data to a linked asset. */
 UCLASS()
@@ -17,7 +22,7 @@ public:
 
 	/** Export to this data asset on save. */
 	UPROPERTY(Category = "ExportSettings", EditAnywhere)
-	TObjectPtr<class UTileDataAsset> DataAsset;
+	TObjectPtr<UTileDataAsset> DataAsset;
 
 	/** Export the tile with this preferred scheme. */
 	UPROPERTY(Category = "ExportSettings", EditAnywhere)
@@ -25,11 +30,11 @@ public:
 
 	/** Tile portal actors that should be exported. */
 	UPROPERTY(Category = "ExportSettings", EditAnywhere)
-	TArray<TObjectPtr<class ATilePortalActor>> PortalActors;
+	TArray<TObjectPtr<ATilePortalActor>> PortalActors;
 
 	/** Tile bound actors that should be exported. */
 	UPROPERTY(Category = "ExportSettings", EditAnywhere)
-	TArray<TObjectPtr<class ATileBoundActor>> BoundActors;
+	TArray<TObjectPtr<ATileBoundActor>> BoundActors;
 
 	ATileDataExport();
 
@@ -37,20 +42,20 @@ private:
 
 	/** Scene component used as the actor root for all builds. */
 	UPROPERTY(BlueprintReadOnly, Category = "ExportActor", VisibleAnywhere, meta = (AllowPrivateAccess = true))
-	TObjectPtr<class USceneComponent> SceneComponent;
+	TObjectPtr<USceneComponent> SceneComponent;
 
 #if WITH_EDITORONLY_DATA
 
 	/** Billboard component used to access the export actor in-editor. */
 	UPROPERTY()
-	TObjectPtr<class UBillboardComponent> SpriteComponent;
+	TObjectPtr<UBillboardComponent> SpriteComponent;
 
 #endif
 
 public:
 
 	/** @return Scene component used as the actor root for all builds. */
-	class USceneComponent* GetSceneComponent() const
+	USceneComponent* GetSceneComponent() const
 	{
 		return SceneComponent;
 	}
@@ -58,17 +63,13 @@ public:
 #if WITH_EDITORONLY_DATA
 
 	/** @return Billboard component used to access the export actor in-editor. */
-	class UBillboardComponent* GetSpriteComponent() const
+	UBillboardComponent* GetSpriteComponent() const
 	{
 		return SpriteComponent;
 	}
 
 #endif
 
-#if WITH_EDITOR
-
 	/** Actually executes the tile level export to the linked data asset. */
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
-
-#endif
 };

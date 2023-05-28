@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Tileset/TileBound.h"
-#include "Tileset/TilePortal.h"
-#include "TileLibrary.generated.h"
+#include "TileDataLibrary.generated.h"
 
-/** Provides blueprint functions for the tile generation system. */
+struct FTileBound;
+struct FTilePortal;
+
+/** Provides blueprint functions for tile data objects. */
 UCLASS()
-class IOTACORE_API UTileLibrary : public UBlueprintFunctionLibrary
+class IOTACORE_API UTileDataLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

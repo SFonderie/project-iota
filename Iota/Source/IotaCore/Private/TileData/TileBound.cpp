@@ -1,6 +1,6 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "Tileset/TileBound.h"
+#include "TileData/TileBound.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileBound)
 

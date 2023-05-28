@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tileset/TilePortal.h"
 #include "TilePortalActor.generated.h"
+
+class UBoxComponent;
+class UBillboardComponent;
+class UArrowComponent;
 
 /** Represents a tile connection portal in the world. */
 UCLASS()
@@ -23,30 +26,30 @@ public:
 	 * @return The actor transform converted into a data-only form.
 	 */
 	UFUNCTION(BlueprintPure, Category = "TilePortal")
-	FTilePortal GetTilePortal() const;
+	struct FTilePortal GetTilePortal() const;
 
 private:
 
 	/** Box component used to show the portal plane in-editor. */
 	UPROPERTY(BlueprintReadOnly, Category = "TilePortal", VisibleAnywhere, meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UBoxComponent> PlaneComponent;
+	TObjectPtr<UBoxComponent> PlaneComponent;
 
 #if WITH_EDITORONLY_DATA
 
 	/** Billboard component used to show the portal location in-editor. */
 	UPROPERTY()
-	TObjectPtr<class UBillboardComponent> SpriteComponent;
+	TObjectPtr<UBillboardComponent> SpriteComponent;
 
 	/** Arrow component used to show the portal direction in-editor. */
 	UPROPERTY()
-	TObjectPtr<class UArrowComponent> ArrowComponent;
+	TObjectPtr<UArrowComponent> ArrowComponent;
 
 #endif
 
 public:
 
 	/** @return Box component used to show the portal bounding box in-editor. */
-	class UBoxComponent* GetPlaneComponent() const
+	UBoxComponent* GetPlaneComponent() const
 	{
 		return PlaneComponent;
 	}
@@ -54,13 +57,13 @@ public:
 #if WITH_EDITORONLY_DATA
 
 	/** @return Billboard component used to show the portal location in-editor. */
-	class UBillboardComponent* GetSpriteComponent() const
+	UBillboardComponent* GetSpriteComponent() const
 	{
 		return SpriteComponent;
 	}
 
 	/** @return Arrow component used to show the portal direction in-editor. */
-	class UArrowComponent* GetArrowComponent() const
+	UArrowComponent* GetArrowComponent() const
 	{
 		return ArrowComponent;
 	}
