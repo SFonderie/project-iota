@@ -50,9 +50,9 @@ enum class ETileScheme : uint8
 	Exit,
 };
 
-/** Container describing a tile. */
+/** Primary data asset type describing a tile level. */
 UCLASS()
-class IOTACORE_API UTileDataAsset : public UDataAsset
+class IOTACORE_API UTileDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
@@ -73,12 +73,4 @@ public:
 	/** A list of the tile's summary collision bounds. */
 	UPROPERTY(Category = "Description", EditAnywhere)
 	TArray<FTileBound> Bounds;
-
-private:
-
-	/** Saves the tile data asset to disk. */
-	void SaveAsset();
-
-	// Allows access to Save Asset.
-	friend class ATileDataExport;
 };

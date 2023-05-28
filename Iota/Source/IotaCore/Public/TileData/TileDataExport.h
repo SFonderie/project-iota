@@ -29,11 +29,11 @@ public:
 	ETileScheme PreferredScheme = ETileScheme::Stopper;
 
 	/** Tile portal actors that should be exported. */
-	UPROPERTY(Category = "ExportSettings", EditAnywhere)
+	UPROPERTY(Category = "ExportActors", EditAnywhere)
 	TArray<TObjectPtr<ATilePortalActor>> PortalActors;
 
 	/** Tile bound actors that should be exported. */
-	UPROPERTY(Category = "ExportSettings", EditAnywhere)
+	UPROPERTY(Category = "ExportActors", EditAnywhere)
 	TArray<TObjectPtr<ATileBoundActor>> BoundActors;
 
 	ATileDataExport();
@@ -41,7 +41,7 @@ public:
 private:
 
 	/** Scene component used as the actor root for all builds. */
-	UPROPERTY(BlueprintReadOnly, Category = "ExportActor", VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "ExportSettings", VisibleAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComponent;
 
 #if WITH_EDITORONLY_DATA
@@ -70,6 +70,6 @@ public:
 
 #endif
 
-	/** Actually executes the tile level export to the linked data asset. */
+	/** Actually exports the actor into the linked data asset. */
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
 };

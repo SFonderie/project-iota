@@ -9,6 +9,8 @@
 #include "Components/BillboardComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/ObjectSaveContext.h"
+#include "UObject/SavePackage.h"
+#include "UObject/Package.h"
 #include "Engine/Texture2D.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileDataExport)
@@ -71,14 +73,23 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 
 		for (const ATilePortalActor* TilePortalActor : PortalActors)
 		{
+			// Export each tile portal actor as a tile portal structure.
 			DataAsset->Portals.Emplace(TilePortalActor->GetTilePortal());
 		}
 
 		for (const ATileBoundActor* TileBoundActor : BoundActors)
 		{
+			// Export each tile bound actor as a tile bound structure.
 			DataAsset->Bounds.Emplace(TileBoundActor->GetTileBound());
 		}
 
-		DataAsset->SaveAsset();
+		// Access the data asset's package so that it can be saved.
+		UPackage* AssetPackage = DataAsset->GetPackage();
+
+		// Extract the data asset package location on the local disk.
+		FString FileName = FPackageName::LongPackageNameToFilename(AssetPackage->GetName(), FPackageName::GetAssetPackageExtension());
+
+		// Save the package and asset at the file location using default arguments.
+		UPackage::SavePackage(AssetPackage, DataAsset, *FileName, FSavePackageArgs());
 	}
 }
