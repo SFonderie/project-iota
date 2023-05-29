@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "GameplayTagContainer.h"
 #include "TileDataAsset.generated.h"
 
 struct FTilePortal;
@@ -59,18 +60,22 @@ class IOTACORE_API UTileDataAsset : public UPrimaryDataAsset
 public:
 
 	/** Pointer to the actual tile level instance. */
-	UPROPERTY(Category = "Level", EditAnywhere)
+	UPROPERTY(Category = "TileLevel", EditAnywhere)
 	TSoftObjectPtr<UWorld> Level;
 
 	/** Preferred tile scheme. */
-	UPROPERTY(Category = "Level", EditAnywhere)
+	UPROPERTY(Category = "TileLevel", EditAnywhere)
 	ETileScheme Scheme = ETileScheme::Stopper;
 
 	/** A list of the tile's exit portals. */
-	UPROPERTY(Category = "Description", EditAnywhere)
+	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTilePortal> Portals;
 
 	/** A list of the tile's summary collision bounds. */
-	UPROPERTY(Category = "Description", EditAnywhere)
+	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTileBound> Bounds;
+
+	/** Tileset to which the tile belongs. */
+	UPROPERTY(AssetRegistrySearchable, Category = "TileData", EditAnywhere, meta = (Categories = "Tileset"))
+	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
 };

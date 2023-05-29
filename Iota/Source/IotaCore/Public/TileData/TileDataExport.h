@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TileData/TileDataAsset.h"
+#include "GameplayTagContainer.h"
 #include "TileDataExport.generated.h"
 
 class ATilePortalActor;
@@ -21,11 +22,11 @@ class IOTACORE_API ATileDataExport : public AActor
 public:
 
 	/** Export to this data asset on save. */
-	UPROPERTY(Category = "ExportSettings", EditAnywhere)
+	UPROPERTY(Category = "ExportLevel", EditAnywhere)
 	TObjectPtr<UTileDataAsset> DataAsset;
 
 	/** Export the tile with this preferred scheme. */
-	UPROPERTY(Category = "ExportSettings", EditAnywhere)
+	UPROPERTY(Category = "ExportLevel", EditAnywhere)
 	ETileScheme PreferredScheme = ETileScheme::Stopper;
 
 	/** Tile portal actors that should be exported. */
@@ -35,6 +36,10 @@ public:
 	/** Tile bound actors that should be exported. */
 	UPROPERTY(Category = "ExportActors", EditAnywhere)
 	TArray<TObjectPtr<ATileBoundActor>> BoundActors;
+
+	/** Tileset to which the tile belongs. */
+	UPROPERTY(Category = "ExportData", EditAnywhere, meta = (Categories = "Tileset"))
+	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
 
 	ATileDataExport();
 

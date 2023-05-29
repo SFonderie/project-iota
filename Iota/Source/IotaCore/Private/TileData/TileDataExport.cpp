@@ -70,6 +70,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 		DataAsset->Scheme = PreferredScheme;
 		DataAsset->Portals.Empty(PortalActors.Num());
 		DataAsset->Bounds.Empty(BoundActors.Num());
+		DataAsset->Tileset = Tileset;
 
 		for (const ATilePortalActor* TilePortalActor : PortalActors)
 		{
