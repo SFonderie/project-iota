@@ -48,6 +48,11 @@ enum class ETileScheme : uint8
 	 * Exit tiles must have at least one portal.
 	 */
 	Exit,
+
+	/**
+	 * Internal enum value used to create static arrays.
+	 */
+	Count UMETA(Hidden),
 };
 
 /** Primary data asset type describing a tile level. */

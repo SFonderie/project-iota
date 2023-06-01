@@ -86,10 +86,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 			UPackage* AssetPackage = DataAssetObject->GetPackage();
 
 			// Extract the data asset package location on the local disk.
-			FString FileName = FPackageName::LongPackageNameToFilename(
-				AssetPackage->GetName(),
-				FPackageName::GetAssetPackageExtension()
-			);
+			FString FileName = FPackageName::LongPackageNameToFilename(AssetPackage->GetName(), FPackageName::GetAssetPackageExtension());
 
 			// Save the package and asset at the file location using default arguments.
 			UPackage::SavePackage(AssetPackage, DataAssetObject, *FileName, FSavePackageArgs());
