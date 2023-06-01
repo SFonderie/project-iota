@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "TileData/TileBound.h"
+#include "TileData/TilePortal.h"
 #include "TileDataLibrary.generated.h"
-
-struct FTileBound;
-struct FTilePortal;
 
 /** Provides blueprint functions for tile data objects. */
 UCLASS()

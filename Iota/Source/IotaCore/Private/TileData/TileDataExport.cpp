@@ -1,10 +1,6 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileData/TileDataExport.h"
-#include "TileData/TilePortalActor.h"
-#include "TileData/TilePortal.h"
-#include "TileData/TileBoundActor.h"
-#include "TileData/TileBound.h"
 #include "Components/SceneComponent.h"
 #include "Components/BillboardComponent.h"
 #include "UObject/ConstructorHelpers.h"
@@ -64,33 +60,39 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
-	if (GIsEditor && DataAsset)
+	if (GIsEditor)
 	{
-		DataAsset->Level = GetWorld();
-		DataAsset->Scheme = PreferredScheme;
-		DataAsset->Portals.Empty(PortalActors.Num());
-		DataAsset->Bounds.Empty(BoundActors.Num());
-		DataAsset->Tileset = Tileset;
-
-		for (const ATilePortalActor* TilePortalActor : PortalActors)
+		if (UTileDataAsset* DataAssetObject = DataAsset.LoadSynchronous())
 		{
-			// Export each tile portal actor as a tile portal structure.
-			DataAsset->Portals.Emplace(TilePortalActor->GetTilePortal());
+			DataAssetObject->Level = GetWorld();
+			DataAssetObject->Scheme = PreferredScheme;
+			DataAssetObject->Portals.Empty(PortalActors.Num());
+			DataAssetObject->Bounds.Empty(BoundActors.Num());
+			DataAssetObject->Tileset = Tileset;
+
+			for (const ATilePortalActor* TilePortalActor : PortalActors)
+			{
+				// Export each tile portal actor as a tile portal structure.
+				DataAssetObject->Portals.Emplace(TilePortalActor->GetTilePortal());
+			}
+
+			for (const ATileBoundActor* TileBoundActor : BoundActors)
+			{
+				// Export each tile bound actor as a tile bound structure.
+				DataAssetObject->Bounds.Emplace(TileBoundActor->GetTileBound());
+			}
+
+			// Access the data asset's package so that it can be saved.
+			UPackage* AssetPackage = DataAssetObject->GetPackage();
+
+			// Extract the data asset package location on the local disk.
+			FString FileName = FPackageName::LongPackageNameToFilename(
+				AssetPackage->GetName(),
+				FPackageName::GetAssetPackageExtension()
+			);
+
+			// Save the package and asset at the file location using default arguments.
+			UPackage::SavePackage(AssetPackage, DataAssetObject, *FileName, FSavePackageArgs());
 		}
-
-		for (const ATileBoundActor* TileBoundActor : BoundActors)
-		{
-			// Export each tile bound actor as a tile bound structure.
-			DataAsset->Bounds.Emplace(TileBoundActor->GetTileBound());
-		}
-
-		// Access the data asset's package so that it can be saved.
-		UPackage* AssetPackage = DataAsset->GetPackage();
-
-		// Extract the data asset package location on the local disk.
-		FString FileName = FPackageName::LongPackageNameToFilename(AssetPackage->GetName(), FPackageName::GetAssetPackageExtension());
-
-		// Save the package and asset at the file location using default arguments.
-		UPackage::SavePackage(AssetPackage, DataAsset, *FileName, FSavePackageArgs());
 	}
 }

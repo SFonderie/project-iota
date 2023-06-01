@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TileData/TileDataAsset.h"
+#include "TileData/TilePortalActor.h"
+#include "TileData/TileBoundActor.h"
 #include "GameplayTagContainer.h"
 #include "TileDataExport.generated.h"
 
-class ATilePortalActor;
-class ATileBoundActor;
 class USceneComponent;
 class UBillboardComponent;
 
@@ -23,7 +23,7 @@ public:
 
 	/** Export to this data asset on save. */
 	UPROPERTY(Category = "ExportLevel", EditAnywhere)
-	TObjectPtr<UTileDataAsset> DataAsset;
+	TSoftObjectPtr<UTileDataAsset> DataAsset;
 
 	/** Export the tile with this preferred scheme. */
 	UPROPERTY(Category = "ExportLevel", EditAnywhere)
@@ -54,24 +54,6 @@ private:
 	/** Billboard component used to access the export actor in-editor. */
 	UPROPERTY()
 	TObjectPtr<UBillboardComponent> SpriteComponent;
-
-#endif
-
-public:
-
-	/** @return Scene component used as the actor root for all builds. */
-	USceneComponent* GetSceneComponent() const
-	{
-		return SceneComponent;
-	}
-
-#if WITH_EDITORONLY_DATA
-
-	/** @return Billboard component used to access the export actor in-editor. */
-	UBillboardComponent* GetSpriteComponent() const
-	{
-		return SpriteComponent;
-	}
 
 #endif
 

@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TileData/TileBound.h"
 #include "TileBoundActor.generated.h"
 
-struct FTileBound;
 class UBoxComponent;
 
 /** Represents an oriented tile bounding box in the world. */
@@ -33,17 +33,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "TileBound", VisibleAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UBoxComponent> BoxComponent;
 
-public:
-
-	/** @return Box component used to show the tile bound in-editor. */
-	UBoxComponent* GetBoxComponent() const
-	{
-		return BoxComponent;
-	}
-
 #if WITH_EDITOR
-
-private:
 
 	/**
 	 * Invoked whenever the user changes the actor scale using the editor viewport widget. Tile

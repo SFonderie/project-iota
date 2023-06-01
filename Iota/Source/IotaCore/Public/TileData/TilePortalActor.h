@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TileData/TilePortal.h"
 #include "TilePortalActor.generated.h"
 
 class UBoxComponent;
@@ -26,7 +27,7 @@ public:
 	 * @return The actor transform converted into a data-only form.
 	 */
 	UFUNCTION(BlueprintPure, Category = "TilePortal")
-	struct FTilePortal GetTilePortal() const;
+	FTilePortal GetTilePortal() const;
 
 private:
 
@@ -46,33 +47,7 @@ private:
 
 #endif
 
-public:
-
-	/** @return Box component used to show the portal bounding box in-editor. */
-	UBoxComponent* GetPlaneComponent() const
-	{
-		return PlaneComponent;
-	}
-
-#if WITH_EDITORONLY_DATA
-
-	/** @return Billboard component used to show the portal location in-editor. */
-	UBillboardComponent* GetSpriteComponent() const
-	{
-		return SpriteComponent;
-	}
-
-	/** @return Arrow component used to show the portal direction in-editor. */
-	UArrowComponent* GetArrowComponent() const
-	{
-		return ArrowComponent;
-	}
-
-#endif
-
 #if WITH_EDITOR
-
-private:
 
 	/**
 	 * Invoked whenever the user changes the actor scale using the editor viewport widget. Tile

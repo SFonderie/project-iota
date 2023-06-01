@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "TileData/TileBound.h"
+#include "TileData/TilePortal.h"
 #include "GameplayTagContainer.h"
 #include "TileDataAsset.generated.h"
-
-struct FTilePortal;
-struct FTileBound;
 
 /** Defines different tile functions within a tileset. */
 UENUM(BlueprintType)
