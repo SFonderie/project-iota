@@ -1,6 +1,7 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileData/TilePortalActor.h"
+#include "TileData/TilePortal.h"
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/ArrowComponent.h"

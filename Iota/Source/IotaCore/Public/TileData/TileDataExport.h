@@ -57,6 +57,26 @@ private:
 
 #endif
 
+public:
+
+	/** @return Scene component used as the actor root for all builds. */
+	USceneComponent* GetSceneComponent() const
+	{
+		return SceneComponent;
+	}
+
+#if WITH_EDITORONLY_DATA
+
+	/** @return Billboard component used to access the export actor in-editor. */
+	UBillboardComponent* GetSpriteComponent() const
+	{
+		return SpriteComponent;
+	}
+
+#endif
+
+protected:
+
 	/** Actually exports the actor into the linked data asset. */
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
 };

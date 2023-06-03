@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TileData/TilePortal.h"
 #include "TilePortalActor.generated.h"
 
+struct FTilePortal;
 class UBoxComponent;
 class UBillboardComponent;
 class UArrowComponent;
@@ -47,7 +47,33 @@ private:
 
 #endif
 
+public:
+
+	/** @return Box component used to show the portal plane in-editor. */
+	UBoxComponent* GetPlaneComponent() const
+	{
+		return PlaneComponent;
+	}
+
+#if WITH_EDITORONLY_DATA
+
+	/** @return Billboard component used to show the portal location in-editor. */
+	UBillboardComponent* GetSpriteComponent() const
+	{
+		return SpriteComponent;
+	}
+
+	/** @return Arrow component used to show the portal direction in-editor. */
+	UArrowComponent* GetArrowComponent() const
+	{
+		return ArrowComponent;
+	}
+
+#endif
+
 #if WITH_EDITOR
+
+private:
 
 	/**
 	 * Invoked whenever the user changes the actor scale using the editor viewport widget. Tile

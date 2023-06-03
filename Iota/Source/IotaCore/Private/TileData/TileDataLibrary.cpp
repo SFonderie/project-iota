@@ -1,6 +1,8 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileData/TileDataLibrary.h"
+#include "TileData/TileBound.h"
+#include "TileData/TilePortal.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileDataLibrary)
 
