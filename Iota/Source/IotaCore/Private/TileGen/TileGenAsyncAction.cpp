@@ -1,7 +1,7 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileGen/TileGenAsyncAction.h"
-#include "TileGen/TileGenParams.h"
+#include "TileGen/TileGenDataStructs.h"
 #include "Engine/AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenAsyncAction)

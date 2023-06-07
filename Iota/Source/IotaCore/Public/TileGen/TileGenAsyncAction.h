@@ -17,7 +17,7 @@ class IOTACORE_API UTileGenAsyncAction : public UCancellableAsyncAction
 public:
 
 	/**
-	 * Starts the tile level generation process using the provided parameters.
+	 * Starts level generation using the provided parameters.
 	 *
 	 * @param WorldContext World context object.
 	 * @param Params Tile generation parameters.
