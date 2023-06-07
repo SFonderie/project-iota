@@ -75,7 +75,7 @@ public:
 	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTilePortal> Portals;
 
-	/** A list of the tile's summary collision bounds. */
+	/** A list of the tile's collision bounds. */
 	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTileBound> Bounds;
 
