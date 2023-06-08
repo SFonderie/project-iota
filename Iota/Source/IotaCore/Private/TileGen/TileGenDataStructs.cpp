@@ -12,7 +12,8 @@ FTileGenParams::FTileGenParams()
 
 FTileGenParams::FTileGenParams(const FTileGenParams& InParams)
 	: Tileset(InParams.Tileset)
-	, Breadth(InParams.Breadth)
+	, Length(InParams.Length)
+	, Branch(InParams.Branch)
 	, Seed(InParams.Seed)
 {
 	// Copy constructor.
@@ -37,4 +38,38 @@ FTileGenData::FTileGenData(const FTileGenData& InTileData)
 	, Bounds(InTileData.Bounds)
 {
 	// Copy constructor.
+}
+
+FTileGenPlan::FTileGenPlan(const FTileGenData& InTileData, const FTransform& InTransform)
+	: FTileGenData(InTileData)
+	, Position(InTransform.GetLocation())
+	, Rotation(InTransform.GetRotation())
+{
+	for (FTilePortal& Portal : Portals)
+	{
+		Portal = FTilePortal(Portal, InTransform);
+	}
+
+	for (FTileBound& Bound : Bounds)
+	{
+		Bound = FTileBound(Bound, InTransform);
+	}
+}
+
+bool FTileGenPlan::IsOpenPortal(int32 Index) const
+{
+	check(0 <= Index && Index < sizeof(PortalsMask) * 8);
+	return (PortalsMask & (1 << Index)) == 0;
+}
+
+void FTileGenPlan::OpenPortal(int32 Index)
+{
+	check(0 <= Index && Index < sizeof(PortalsMask) * 8);
+	PortalsMask &= PortalsMask ^ (1 << Index);
+}
+
+void FTileGenPlan::ClosePortal(int32 Index)
+{
+	check(0 <= Index && Index < sizeof(PortalsMask) * 8);
+	PortalsMask |= (1 << Index);
 }

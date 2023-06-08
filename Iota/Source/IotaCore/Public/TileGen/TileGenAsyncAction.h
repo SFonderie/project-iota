@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/CancellableAsyncAction.h"
+#include "TileGen/TileGenDataStructs.h"
 #include "TileGenAsyncAction.generated.h"
-
-struct FTileGenParams;
 
 /** Asynchronous action prepares and tracks level generation. */
 UCLASS()
@@ -41,4 +40,9 @@ public:
 
 	/** Closes generation. */
 	virtual void Cancel() override;
+
+private:
+
+	/** Generation parameters. */
+	FTileGenParams Params;
 };

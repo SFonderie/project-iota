@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "TileData/TilePortal.h"
 #include "TileData/TileBound.h"
+#include "TileData/TilePlan.h"
 #include "TileGenDataStructs.generated.h"
 
 class UTileDataAsset;
@@ -22,9 +23,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "Tileset"))
 	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
 
-	/** Breadth of the level not including start, exit, or stopper tiles. */
+	/** Length of the level, not including start, exit, or stopper tiles. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 Breadth = 16;
+	int32 Length = 16;
+
+	/** Maximum possible branch length when not otherwise restricted. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 Branch = 4;
 
 	/** Generates the new level using this seed value. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -38,7 +43,7 @@ public:
 };
 
 /** Thread-cached copy of UTileDataAsset. */
-struct IOTACORE_API FTileGenData
+struct FTileGenData
 {
 	/** Path to the actual tile level instance. */
 	FSoftObjectPath Level;
@@ -57,4 +62,47 @@ struct IOTACORE_API FTileGenData
 
 	/** Copies values from the given tile data object. */
 	FTileGenData(const FTileGenData& InData);
+};
+
+/** 
+ * Extension of Tile Gen Data that includes a world transform and tile state information like
+ * portal states. When generation completes, these planned tiles are exported to standard tile
+ * plan structs and then replicated via the Game State.
+ */
+struct FTileGenPlan : public FTileGenData
+{
+	/** Tile world position. */
+	FVector Position;
+
+	/** Tile world rotation. */
+	FRotator Rotation;
+
+	/** Bitmask tracking portal index state. 0 values are open, 1 values are closed. */
+	uint32 PortalsMask = 0;
+
+	/** Parent tile plan array element. */
+	const FTileGenPlan* Parent = nullptr;
+
+	/** 
+	 * Copies values from the given tile data object and transform to create a world tile plan.
+	 * 
+	 * @param InTileData Base tile data with which to build the plan.
+	 * @param InTransform World transform to apply to the tile data components.
+	 */
+	FTileGenPlan(const FTileGenData& InTileData, const FTransform& InTransform);
+
+	/** @return True if the portal at the given index is marked open. */
+	bool IsOpenPortal(int32 Index) const;
+
+	/** Marks the portal at the given index open. */
+	void OpenPortal(int32 Index);
+
+	/** Marks the portal at the given index closed. */
+	void ClosePortal(int32 Index);
+
+	/** @return Exports the generation plan to a tile plan. */
+	FTilePlan GetTilePlan() const
+	{
+		return FTilePlan(TSoftObjectPtr<UWorld>(Level), Position, Rotation);
+	}
 };
