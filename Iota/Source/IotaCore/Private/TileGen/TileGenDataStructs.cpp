@@ -12,7 +12,7 @@ FTileGenParams::FTileGenParams()
 
 FTileGenParams::FTileGenParams(const FTileGenParams& InParams)
 	: Tileset(InParams.Tileset)
-	, Length(InParams.Length)
+	, Size(InParams.Size)
 	, Branch(InParams.Branch)
 	, Seed(InParams.Seed)
 {

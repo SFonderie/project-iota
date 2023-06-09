@@ -7,6 +7,9 @@
 #include "TileGen/TileGenDataStructs.h"
 #include "TileGenAsyncAction.generated.h"
 
+struct FStreamableHandle;
+class FTileGenWorker;
+
 /** Asynchronous action prepares and tracks level generation. */
 UCLASS()
 class IOTACORE_API UTileGenAsyncAction : public UCancellableAsyncAction
@@ -31,18 +34,26 @@ public:
 	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Complete")
 	FTileGenAsyncEvent OnGenerationComplete;
 
-	/** Executes if the generation process fails. */
-	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Failure")
-	FTileGenAsyncEvent OnGenerationFailure;
-
 	/** Initiates generation. */
 	virtual void Activate() override;
 
-	/** Closes generation. */
+	/** Stops generation. */
 	virtual void Cancel() override;
 
 private:
 
+	/** Starts the Tile Gen Worker once tile loading is complete. */
+	void StartWorkerThread();
+
 	/** Generation parameters. */
 	FTileGenParams Params;
+
+	/** Unloaded generator tile list. */
+	TArray<FPrimaryAssetId> TileAssetList;
+
+	/** Handle used to track tile asset loading. */
+	TSharedPtr<FStreamableHandle> AssetLoadingHandle;
+
+	/** Handle used to track the worker thread. */
+	TSharedPtr<FTileGenWorker> GenerationWorker;
 };

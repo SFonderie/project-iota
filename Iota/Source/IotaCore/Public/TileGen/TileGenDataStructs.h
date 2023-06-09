@@ -23,9 +23,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "Tileset"))
 	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
 
-	/** Length of the level, not including start, exit, or stopper tiles. */
+	/** Size of the level not including any stopper tiles. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 Length = 16;
+	int32 Size = 16;
 
 	/** Maximum possible branch length when not otherwise restricted. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -80,8 +80,8 @@ struct FTileGenPlan : public FTileGenData
 	/** Bitmask tracking portal index state. 0 values are open, 1 values are closed. */
 	uint32 PortalsMask = 0;
 
-	/** Parent tile plan array element. */
-	const FTileGenPlan* Parent = nullptr;
+	/** Index of the parent tile plan array element. Used to traverse the tile tree. */
+	int32 ParentIndex = -1;
 
 	/** 
 	 * Copies values from the given tile data object and transform to create a world tile plan.

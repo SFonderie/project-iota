@@ -25,7 +25,7 @@ public:
 	 */
 	FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& InTileList);
 
-	/** 
+	/**
 	 * Safely discards the worker and its thread. If the thread is still running when the worker is
 	 * destroyed, the thread will first stop before being deleted.
 	 */
@@ -61,11 +61,37 @@ public:
 
 private:
 
-	// bool PlaceNewTile();
+	/**
+	 * Attempts to add a new tile of the given scheme to the level plan.
+	 * 
+	 * @param Scheme Tile scheme for the new tile to add.
+	 * @return False if no tile could be placed.
+	 */
+	bool PlaceNewTile(ETileScheme Scheme);
 
-	// bool TryPlaceTile();
+	/**
+	 * Attempts to find a viable attachment point for the given tile data. If one is found, the
+	 * tile data will be converted into a plan and appended to the level plan. Attachment points
+	 * are determined by traversing the last-placed tile's parents to the branch parameter depth
+	 * and considering all open portals on those tiles.
+	 *
+	 * @param NewTile Tile to attach.
+	 * @param Scheme Scheme of the new tile.
+	 * @return False if there was no viable attachment point.
+	 */
+	bool TryPlaceTile(const FTileGenData& NewTile, ETileScheme Scheme);
 
-	// bool CanPlaceTile();
+	/**
+	 * Checks to see if the given tile can be placed at the given transform via collision checks.
+	 * Each bound on the new tile is compared to each bound on the tile plans, and the method will
+	 * return false if even a single collision check returns true. Collision checks automatically
+	 * pass if the two bounds are too distant to collide.
+	 * 
+	 * @param NewTile Tile data to test.
+	 * @param Transform World transform to apply to the tile.
+	 * @return False if the tile would collide at its new transform.
+	 */
+	bool CanPlaceTile(const FTileGenData& NewTile, const FTransform& Transform) const;
 
 	/**
 	 * Shuffles the given array using the worker's random stream. Elements are swapped in order,

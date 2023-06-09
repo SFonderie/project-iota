@@ -1,6 +1,8 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileGen/TileGenAsyncAction.h"
+#include "TileGen/TileGenWorker.h"
+#include "TileData/TileDataAsset.h"
 #include "Engine/AssetManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenAsyncAction)
@@ -15,10 +17,68 @@ UTileGenAsyncAction* UTileGenAsyncAction::GenerateLevel(const UObject* WorldCont
 
 void UTileGenAsyncAction::Activate()
 {
+	UAssetManager& AssetManager = UAssetManager::Get();
+	TileAssetList.Empty();
 
+	// Load all tile data asset information into a list so it can be filtered.
+	TArray<FAssetData> TileAssetData;
+	AssetManager.GetPrimaryAssetDataList(UTileDataAsset::StaticClass()->GetFName(), TileAssetData);
+
+	// Filter the asset data tags for the target tileset.
+	// If found, add the asset data to the tile ID list.
+	for (const FAssetData& AssetData : TileAssetData)
+	{
+		FGameplayTag AssetDataTag;
+		FString AssetDataRawString;
+
+		if (AssetData.GetTagValue(GET_MEMBER_NAME_CHECKED(UTileDataAsset, Tileset), AssetDataRawString))
+		{
+			AssetDataTag.FromExportString(AssetDataRawString);
+
+			if (AssetDataTag == Params.Tileset)
+			{
+				TileAssetList.Emplace(AssetData.GetPrimaryAssetId());
+			}
+		}
+	}
+
+	// First asynchronous phase: executing is passed to the streamable manager to load in requested
+	// tile data assets. If no loading is necessary, the delegate will fire immediately.
+	FStreamableDelegate Callback = FStreamableDelegate::CreateUObject(this, &UTileGenAsyncAction::StartWorkerThread);
+	AssetLoadingHandle = AssetManager.LoadPrimaryAssets(TileAssetList, TArray<FName>(), Callback);
 }
 
 void UTileGenAsyncAction::Cancel()
 {
 	Super::Cancel();
+
+	if (AssetLoadingHandle.IsValid())
+	{
+		AssetLoadingHandle->CancelHandle();
+		AssetLoadingHandle.Reset();
+	}
+
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker.Reset();
+	}
+}
+
+void UTileGenAsyncAction::StartWorkerThread()
+{
+	// Start the worker thread. Doing so starts the main asynchronous phase.
+	// See the Tile Gen Worker class for the actual generation code.
+	GenerationWorker = MakeShared<FTileGenWorker>(Params, TileAssetList);
+
+	// Creating the worker thread copies all loaded assets into a thread-local cache.
+	// The assets can therefore be unloaded since they have served their purpose.
+	if (AssetLoadingHandle.IsValid())
+	{
+		AssetLoadingHandle.Reset();
+	}
+
+	// Unloading assets only works if the assets aren't referenced anywhere else.
+	// Since the handle was released, they should now be isolated.
+	UAssetManager& AssetManager = UAssetManager::Get();
+	AssetManager.UnloadPrimaryAssets(TileAssetList);
 }
