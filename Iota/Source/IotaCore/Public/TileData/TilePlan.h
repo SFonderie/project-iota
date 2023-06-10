@@ -7,7 +7,7 @@
 #include "TileData/TileBound.h"
 #include "TilePlan.generated.h"
 
-/** Replicated structure representing a tile planned by level generation. */
+/** Structure representing a tile planned by level generation. */
 USTRUCT(BlueprintType)
 struct IOTACORE_API FTilePlan
 {

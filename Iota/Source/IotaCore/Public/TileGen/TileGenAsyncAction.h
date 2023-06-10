@@ -46,7 +46,7 @@ public:
 
 	/**
 	 * Attempts to return the generated level plan as an array of Tile Plans. If the async action
-	 * has not completed yet or an error was thrown, this method will return an empty array.
+	 * has not completed or an error was thrown, this method will return an empty array.
 	 * 
 	 * @return Level plan array.
 	 */

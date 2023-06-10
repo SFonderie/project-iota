@@ -178,7 +178,7 @@ bool FTileGenWorker::PlaceStopper(const FTilePortal& AttachPortal)
 
 	for (const FTileGenData& NewTile : TilePalettes[uint8(ETileScheme::Stopper)])
 	{
-		if (!NewTile.Portals.IsEmpty())
+		if (!NewTile.Portals.IsEmpty() && NewTile.Portals[0].CanConnect(AttachPortal))
 		{
 			FTransform NewTransform = FTilePortal::ConnectionTransform(NewTile.Portals[0], AttachPortal);
 
