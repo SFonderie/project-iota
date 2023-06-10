@@ -32,6 +32,12 @@ public:
 	virtual ~FTileGenWorker();
 
 	/**
+	 * Starts the tile generation worker by creating its runnable thread.
+	 * Called on the source thread to create the runnable thread.
+	 */
+	virtual void Start();
+
+	/**
 	 * Initializes the tile generation worker. Used to prepare member variables.
 	 * Called automatically on the runnable thread when it starts up.
 	 *
@@ -59,15 +65,64 @@ public:
 	 */
 	virtual void Exit() override;
 
+	/**
+	 * @return Current normalized thread progress.
+	 */
+	virtual float Status() const;
+
+	/**
+	 * Outputs the generated level plan. If the worker was stopped, exited with an error code, or
+	 * is still active, the given array will be returned empty.
+	 */
+	virtual void Output(TArray<FTilePlan>& OutTilePlan) const;
+
+	/** 
+	 * Callback invoked when the worker exits.
+	 */
+	FSimpleDelegate OnExit;
+
+protected:
+
+	/**
+	 * Invoked at the start of level generation to produce a sequence of tile schemes. By default,
+	 * this method generates a sequence composed of a start tile at the first position, an exit
+	 * tile at the last position, and fills the rest with connectors and intermediates.
+	 *
+	 * Objectives and stoppers can be included where necessary.
+	 *
+	 * @param OutSequence Container for the completed sequence.
+	 */
+	virtual void GenerateSequence(TArray<ETileScheme>& OutSequence);
+
+	/**
+	 * Invoked for each tile added to the level plan to determine valid parentage. By default,
+	 * this method will return the desired value unless the tile is an objective tile, in which
+	 * case the parent will be invalid (-1) to split the level over objectives.
+	 *
+	 * @param ParentIndex Desired parent index.
+	 * @param Scheme New tile scheme.
+	 * @return Validated parent index.
+	 */
+	virtual int32 DetermineParent(int32 ParentIndex, ETileScheme Scheme);
+
 private:
 
 	/**
 	 * Attempts to add a new tile of the given scheme to the level plan.
-	 * 
+	 *
 	 * @param Scheme Tile scheme for the new tile to add.
 	 * @return False if no tile could be placed.
 	 */
 	bool PlaceNewTile(ETileScheme Scheme);
+
+	/**
+	 * Attempts to fit a stopper tile to the given attachment portal. Keeps trying new stoppers
+	 * until one can be attached or no stoppers remain.
+	 *
+	 * @param AttachPortal Tile portal to which to attach a stopper.
+	 * @return False if no stopper tile could be attached.
+	 */
+	bool PlaceStopper(const FTilePortal& AttachPortal);
 
 	/**
 	 * Attempts to find a viable attachment point for the given tile data. If one is found, the
@@ -86,7 +141,7 @@ private:
 	 * Each bound on the new tile is compared to each bound on the tile plans, and the method will
 	 * return false if even a single collision check returns true. Collision checks automatically
 	 * pass if the two bounds are too distant to collide.
-	 * 
+	 *
 	 * @param NewTile Tile data to test.
 	 * @param Transform World transform to apply to the tile.
 	 * @return False if the tile would collide at its new transform.
@@ -122,4 +177,10 @@ private:
 
 	/** Current list of generated tile plans. */
 	TArray<FTileGenPlan> TilePlans;
+
+	/** Thread-safe flag used to check completion. */
+	FThreadSafeBool bWorkComplete = false;
+
+	/** Thread-safe flag providing error insights. */
+	FThreadSafeBool bWithError = false;
 };

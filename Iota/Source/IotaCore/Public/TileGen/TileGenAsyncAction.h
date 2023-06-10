@@ -30,20 +30,39 @@ public:
 	/** Blueprint-accessible generation callback event. */
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileGenAsyncEvent);
 
-	/** Executes when the generation process has completed. */
+	/** Executes when the generation process successfully completes. */
 	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Complete")
 	FTileGenAsyncEvent OnGenerationComplete;
+
+	/** Executes when the generation process fails or stops early. */
+	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Failed")
+	FTileGenAsyncEvent OnGenerationFailure;
 
 	/** Initiates generation. */
 	virtual void Activate() override;
 
-	/** Stops generation. */
+	/** Ends or closes generation. */
 	virtual void Cancel() override;
+
+	/**
+	 * Attempts to return the generated level plan as an array of Tile Plans. If the async action
+	 * has not completed yet or an error was thrown, this method will return an empty array.
+	 * 
+	 * @return Level plan array.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Async Action")
+	virtual const TArray<FTilePlan>& GetPlan() const
+	{
+		return CompletePlan;
+	}
 
 private:
 
 	/** Starts the Tile Gen Worker once tile loading is complete. */
 	void StartWorkerThread();
+
+	/** Completes the action once the Tile Gen Worker exits. */
+	void NotifyComplete();
 
 	/** Generation parameters. */
 	FTileGenParams Params;
@@ -56,4 +75,7 @@ private:
 
 	/** Handle used to track the worker thread. */
 	TSharedPtr<FTileGenWorker> GenerationWorker;
+
+	/** Holds the completed level plan. */
+	TArray<FTilePlan> CompletePlan;
 };

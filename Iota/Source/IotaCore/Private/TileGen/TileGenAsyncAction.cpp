@@ -66,9 +66,16 @@ void UTileGenAsyncAction::Cancel()
 
 void UTileGenAsyncAction::StartWorkerThread()
 {
-	// Start the worker thread. Doing so starts the main asynchronous phase.
+	// Create the worker, which actually handles most of the generation.
 	// See the Tile Gen Worker class for the actual generation code.
 	GenerationWorker = MakeShared<FTileGenWorker>(Params, TileAssetList);
+
+	// Bind an exit callback to the worker thread and then actually start it.
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->OnExit.BindUObject(this, &UTileGenAsyncAction::NotifyComplete);
+		GenerationWorker->Start();
+	}
 
 	// Creating the worker thread copies all loaded assets into a thread-local cache.
 	// The assets can therefore be unloaded since they have served their purpose.
@@ -81,4 +88,21 @@ void UTileGenAsyncAction::StartWorkerThread()
 	// Since the handle was released, they should now be isolated.
 	UAssetManager& AssetManager = UAssetManager::Get();
 	AssetManager.UnloadPrimaryAssets(TileAssetList);
+}
+
+void UTileGenAsyncAction::NotifyComplete()
+{
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->Output(CompletePlan);
+		GenerationWorker.Reset();
+
+		if (!CompletePlan.IsEmpty())
+		{
+			OnGenerationComplete.Broadcast();
+			return;
+		}
+	}
+
+	OnGenerationFailure.Broadcast();
 }
