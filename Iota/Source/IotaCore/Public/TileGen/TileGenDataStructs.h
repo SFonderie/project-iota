@@ -35,6 +35,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 Seed = 0;
 
+	/** Objective types to include in the level tile subset. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "Objective"))
+	FGameplayTagContainer Objectives;
+
+	/** Number of objective-related tiles to place in the level. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 Complexity = 0;
+
 	/** Creates an empty parameter set. */
 	FTileGenParams();
 

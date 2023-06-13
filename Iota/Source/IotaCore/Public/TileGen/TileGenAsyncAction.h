@@ -10,7 +10,7 @@
 struct FStreamableHandle;
 class FTileGenWorker;
 
-/** Asynchronous action prepares and tracks level generation. */
+/** Asynchronous action that wraps level generation. */
 UCLASS()
 class IOTACORE_API UTileGenAsyncAction : public UCancellableAsyncAction
 {

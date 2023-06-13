@@ -35,7 +35,7 @@ public:
 	 * Starts the tile generation worker by creating its runnable thread.
 	 * Called on the source thread to create the runnable thread.
 	 */
-	virtual void Start();
+	void Start();
 
 	/**
 	 * Initializes the tile generation worker. Used to prepare member variables.
@@ -68,44 +68,28 @@ public:
 	/**
 	 * @return Current normalized thread progress.
 	 */
-	virtual float Status() const;
+	float Status() const;
 
 	/**
 	 * Outputs the generated level plan. If the worker was stopped, exited with an error code, or
 	 * is still active, the given array will be returned empty.
 	 */
-	virtual void Output(TArray<FTilePlan>& OutTilePlan) const;
+	void Output(TArray<FTilePlan>& OutTilePlan) const;
 
 	/** 
 	 * Callback invoked when the worker exits.
 	 */
 	FSimpleDelegate OnExit;
 
-protected:
+private:
 
 	/**
-	 * Invoked at the start of level generation to produce a sequence of tile schemes. By default,
-	 * this method generates a sequence composed of a start tile at the first position, an exit
-	 * tile at the last position, and fills the rest with connectors and intermediates.
-	 *
-	 * Objectives and stoppers can be included where necessary.
-	 *
+	 * Creates a sequence of tile schemes based on the available palettes. Sequences will always
+	 * open with a start tile and attempt to include one objective tile and one exit tile.
+	 * 
 	 * @param OutSequence Container for the completed sequence.
 	 */
-	virtual void GenerateSequence(TArray<ETileScheme>& OutSequence);
-
-	/**
-	 * Invoked for each tile added to the level plan to determine valid parentage. By default,
-	 * this method will return the desired value unless the tile is an objective tile, in which
-	 * case the parent will be invalid (-1) to split the level over objectives.
-	 *
-	 * @param ParentIndex Desired parent index.
-	 * @param Scheme New tile scheme.
-	 * @return Validated parent index.
-	 */
-	virtual int32 DetermineParent(int32 ParentIndex, ETileScheme Scheme);
-
-private:
+	void MakeSequence(TArray<ETileScheme>& OutSequence);
 
 	/**
 	 * Attempts to add a new tile of the given scheme to the level plan.

@@ -15,6 +15,8 @@ FTileGenParams::FTileGenParams(const FTileGenParams& InParams)
 	, Size(InParams.Size)
 	, Branch(InParams.Branch)
 	, Seed(InParams.Seed)
+	, Objectives(InParams.Objectives)
+	, Complexity(InParams.Complexity)
 {
 	// Copy constructor.
 }

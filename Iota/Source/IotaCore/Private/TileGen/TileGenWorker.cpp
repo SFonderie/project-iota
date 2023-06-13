@@ -50,7 +50,7 @@ bool FTileGenWorker::Init()
 uint32 FTileGenWorker::Run()
 {
 	TArray<ETileScheme> Sequence;
-	GenerateSequence(Sequence);
+	MakeSequence(Sequence);
 
 	// Core level generation loop. Worst-case scenario is O(n^4).
 	for (int32 Tile = 0; Tile < Params.Size && !bStopThread; Tile++)
@@ -101,9 +101,9 @@ void FTileGenWorker::Exit()
 
 float FTileGenWorker::Status() const
 {
-	// Divide by double the size because the loop runs twice.
-	// Once to generate the plan, once to place stoppers.
-	return Progress.GetValue() / (Params.Size * 2.0f);
+	// Divide by double the size because the loop runs twice: once to generate the plan, once to
+	// place stoppers. Also ensure that the size won't throw an error.
+	return Progress.GetValue() / (FMath::Max(Params.Size, 1) * 2.0f);
 }
 
 void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan) const
@@ -121,49 +121,67 @@ void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan) const
 	}
 }
 
-void FTileGenWorker::GenerateSequence(TArray<ETileScheme>& OutSequence)
+void FTileGenWorker::MakeSequence(TArray<ETileScheme>& OutSequence)
 {
+	// First tile is always a start tile.
 	OutSequence.Add(ETileScheme::Start);
-	OutSequence.Add(ETileScheme::Connection);
 
-	for (int32 Index = 2; Index < Params.Size - 1; Index++)
+	// All other tiles in the sequence will be Objective, Intermediate, or Connection.
+	// Objectives are the most important, should be evenly spread by a divide method.
+	int32 ObjectiveCount = FMath::Min(Params.Complexity, TilePalettes[uint8(ETileScheme::Objective)].Num());
+	int32 ObjectiveWidth = FMath::Floor((Params.Size - 2) / (FMath::Max(ObjectiveCount, 0) + 1));
+
+	for (int32 Bracket = 0; Bracket <= ObjectiveCount; Bracket++)
 	{
-		ETileScheme Last1 = OutSequence[Index - 1];
-		ETileScheme Last2 = OutSequence[Index - 2];
-
-		switch (Last1)
+		for (int32 Tile = 0; Tile < ObjectiveWidth; Tile++)
 		{
-			case ETileScheme::Connection:
+			if (Tile == 0) // First tile is an Objective or a Connection (first bracket only).
 			{
-				bool bIntermediate = Last2 == ETileScheme::Connection || Random.GetFraction() < 0.5f;
-				OutSequence.Add(bIntermediate ? ETileScheme::Intermediate : ETileScheme::Connection);
-				break;
+				OutSequence.Add(Bracket > 0 ? ETileScheme::Objective : ETileScheme::Connection);
 			}
-
-			default:
+			else // All other tiles alternate between Connection and Intermediate.
 			{
-				OutSequence.Add(ETileScheme::Connection);
-				break;
+				OutSequence.Add(Tile % 2 > 0 ? ETileScheme::Connection : ETileScheme::Intermediate);
 			}
 		}
 	}
 
-	OutSequence.Add(ETileScheme::Exit);
-}
 
-int32 FTileGenWorker::DetermineParent(int32 ParentIndex, ETileScheme Scheme)
-{
-	return Scheme != ETileScheme::Objective ? ParentIndex : -1;
+	// Special case. If the level has requested an objective tile, one exists, but none have been
+	// added (due to a zero width value) then an objective tile should be included.
+	if (ObjectiveCount > 0 && !OutSequence.Contains(ETileScheme::Objective))
+	{
+		OutSequence.Add(ETileScheme::Objective);
+	}
+
+	// Floor is used to handle Objective division, so there will sometimes be a leftover tile.
+	// If that occurs, it should be filled with an extra Connection.
+	if (OutSequence.Num() < Params.Size - 1)
+	{
+		OutSequence.Add(ETileScheme::Connection);
+	}
+
+	// If there is room for a last tile, make it an exit.
+	if (OutSequence.Num() < Params.Size)
+	{
+		OutSequence.Add(ETileScheme::Exit);
+	}
 }
 
 bool FTileGenWorker::PlaceNewTile(ETileScheme Scheme)
 {
-	ShuffleArray(TilePalettes[uint8(Scheme)]);
+	TArray<FTileGenData>& Palette = TilePalettes[uint8(Scheme)];
+	ShuffleArray(Palette);
 
-	for (const FTileGenData& NewTile : TilePalettes[uint8(Scheme)])
+	for (int32 Index = 0; Index < Palette.Num(); Index++)
 	{
-		if (bStopThread || TryPlaceTile(NewTile, Scheme))
+		if (bStopThread || TryPlaceTile(Palette[Index], Scheme))
 		{
+			if (Scheme == ETileScheme::Objective)
+			{
+				Palette.RemoveAtSwap(Index);
+			}
+
 			Progress.Increment();
 			return true;
 		}
@@ -204,7 +222,7 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 		return true;
 	}
 
-	// Portals are stored as Plan, Portal
+	// Portals are stored as Plan, Portal.
 	TArray<TPair<int32, int32>> OpenPortals;
 	int32 PlanIndex = TilePlans.Num() - 1;
 	int32 Depth = 0;
@@ -223,7 +241,15 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 			}
 		}
 
-		// Traverse to the plan's parent.
+		// If the tile is an objective and there is at least one open portal, then stop searching
+		// for additional portals. Doing so turns objectives with more than one portal into a sort
+		// of "one-way valve" that divides the level plan into "before" and "after" sections.
+		if (Scheme == ETileScheme::Objective && !OpenPortals.IsEmpty())
+		{
+			break;
+		}
+
+		// Traverse to the plan's parent and continue.
 		PlanIndex = PlanValue.ParentIndex;
 		++Depth;
 	}
@@ -243,10 +269,10 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 	// Each orientation of the new tile is attempted for an open portal before moving to the next.
 	for (const TPair<int32, int32>& OpenPair : OpenPortals)
 	{
-		for (const int32& TileIndex : TilePortals)
+		for (const int32& NewOpenIndex : TilePortals)
 		{
 			const FTilePortal& PlanPortal = TilePlans[OpenPair.Key].Portals[OpenPair.Value];
-			const FTilePortal& NewPortal = NewTile.Portals[TileIndex];
+			const FTilePortal& NewPortal = NewTile.Portals[NewOpenIndex];
 
 			if (NewPortal.CanConnect(PlanPortal))
 			{
@@ -257,13 +283,13 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 					// Placement check successful; create the tile plan now.
 					FTileGenPlan NewPlan = FTileGenPlan(NewTile, NewTransform);
 
-					// Determine the parenting rules here.
+					// New tile should be parented.
 					NewPlan.ParentIndex = OpenPair.Key;
 
 					// Close the portals used in the connection and then
 					// append the plan to the list.
 					TilePlans[OpenPair.Key].ClosePortal(OpenPair.Value);
-					NewPlan.ClosePortal(TileIndex);
+					NewPlan.ClosePortal(NewOpenIndex);
 					TilePlans.Emplace(NewPlan);
 
 					// Exit.
