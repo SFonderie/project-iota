@@ -21,9 +21,9 @@ public:
 	 * Called on the source thread prior to the runnable thread's creation.
 	 *
 	 * @param InParams Parameters used for tile generation.
-	 * @param InTileList Tile data asset primary IDs used to get loaded data.
+	 * @param TileList Tile data asset primary IDs used to get loaded data.
 	 */
-	FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& InTileList);
+	FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& TileList);
 
 	/**
 	 * Safely discards the worker and its thread. If the thread is still running when the worker is
@@ -71,25 +71,22 @@ public:
 	float Status() const;
 
 	/**
-	 * Outputs the generated level plan. If the worker was stopped, exited with an error code, or
-	 * is still active, the given array will be returned empty.
+	 * @return True if the worker completed successfully.
 	 */
-	void OutputPlan(TArray<FTilePlan>& OutPlan) const;
+	bool IsComplete() const;
 
 	/**
-	 * Outputs the generated level plan bounds. If the worker was stopped, exited with an error
-	 * code, or is still active, the given array will be returned empty.
+	 * Outputs the generated level plan, or an array of plan members. Can return Tile Plans, Tile
+	 * Bounds, and Tile Portals. If the worker is still active, was stopped early, or exited with
+	 * an error code, then this method will return an empty array.
+	 *
+	 * @param InMemberType Tile plan member type to return.
 	 */
-	void OutputBounds(TArray<FTileBound>& OutBounds) const;
-
-	/**
-	 * Outputs the generated level plan portals. If the worker was stopped, exited with an error
-	 * code, or is still active, the given array will be returned empty.
-	 */
-	void OutputPortals(TArray<FTilePortal>& OutPortals) const;
+	template <typename InMemberType>
+	void GetPlan(TArray<InMemberType>& OutPlan) const;
 
 	/** 
-	 * Callback invoked when the worker exits.
+	 * Callback delegate invoked when the worker exits. 
 	 */
 	FSimpleDelegate OnExit;
 
@@ -98,7 +95,7 @@ private:
 	/**
 	 * Creates a sequence of tile schemes based on the available palettes. Sequences will always
 	 * open with a start tile and attempt to include one objective tile and one exit tile.
-	 * 
+	 *
 	 * @param OutSequence Container for the completed sequence.
 	 */
 	void MakeSequence(TArray<ETileScheme>& OutSequence);
@@ -159,12 +156,6 @@ private:
 	/** Pointer to the actual runnable thread. */
 	FRunnableThread* Thread = nullptr;
 
-	/** Thread-safe flag that can stop the thread. */
-	FThreadSafeBool bStopThread = false;
-
-	/** Thread-safe counter approximating generation progress. */
-	FThreadSafeCounter Progress = 0;
-
 	/** Generation random stream. */
 	FRandomStream Random;
 
@@ -173,6 +164,12 @@ private:
 
 	/** Current list of generated tile plans. */
 	TArray<FTileGenPlan> TilePlans;
+
+	/** Thread-safe counter approximating generation progress. */
+	FThreadSafeCounter Progress = 0;
+
+	/** Thread-safe flag that can stop the thread. */
+	FThreadSafeBool bStopThread = false;
 
 	/** Thread-safe flag used to check completion. */
 	FThreadSafeBool bWorkComplete = false;

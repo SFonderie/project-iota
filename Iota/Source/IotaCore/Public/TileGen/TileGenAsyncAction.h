@@ -45,40 +45,31 @@ public:
 	virtual void Cancel() override;
 
 	/**
-	 * Attempts to return the generated level plan as an array of Tile Plans. If the async action
-	 * has not completed or an error was thrown, this method will return an empty array.
-	 *
-	 * @return Level plan array.
+	 * Attempts to return the generated level plan as an array of Tile Plans.
+	 * 
+	 * If the async action has not yet completed, was cancelled, or completed with an error, this
+	 * method will return an empty array. Method is impure to ensure the array gets cached.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Async Action")
-	const TArray<FTilePlan>& GetPlan() const
-	{
-		return CompletePlan;
-	}
+	UFUNCTION(BlueprintPure = false, Category = "Async Action")
+	void GetPlan(TArray<FTilePlan>& OutPlan) const;
 
 	/**
-	 * Attempts to return the generated level plan bounding boxes. If the async action has not
-	 * completed or an error was thrown, this method will return an empty array.
-	 *
-	 * @return Level plan bounds array.
+	 * Attempts to return the generated level plan bounding boxes as an array of Tile Bounds.
+	 * 
+	 * If the async action has not yet completed, was cancelled, or completed with an error, this
+	 * method will return an empty array. Method is impure to ensure the array gets cached.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Async Action")
-	const TArray<FTileBound>& GetBounds() const
-	{
-		return PlanBounds;
-	}
+	UFUNCTION(BlueprintPure = false, Category = "Async Action")
+	void GetBounds(TArray<FTileBound>& OutBounds) const;
 
 	/**
-	 * Attempts to return the generated level plan portals. If the async action has not completed
-	 * or an error was thrown, this method will return an empty array.
-	 *
-	 * @return Level plan portals array.
+	 * Attempts to return the generated level plan portals as an array of Tile Portals.
+	 * 
+	 * If the async action has not yet completed, was cancelled, or completed with an error, this
+	 * method will return an empty array. Method is impure to ensure the array gets cached.
 	 */
-	UFUNCTION(BlueprintPure, Category = "Async Action")
-	const TArray<FTilePortal>& GetPortals() const
-	{
-		return PlanPortals;
-	}
+	UFUNCTION(BlueprintPure = false, Category = "Async Action")
+	void GetPortals(TArray<FTilePortal>& OutPortals) const;
 
 private:
 
@@ -99,13 +90,4 @@ private:
 
 	/** Handle used to track the worker thread. */
 	TSharedPtr<FTileGenWorker> GenerationWorker;
-
-	/** Holds the completed level plan. */
-	TArray<FTilePlan> CompletePlan;
-
-	/** Holds the level plan bounds. */
-	TArray<FTileBound> PlanBounds;
-
-	/** Holds the level plan portals. */
-	TArray<FTilePortal> PlanPortals;
 };

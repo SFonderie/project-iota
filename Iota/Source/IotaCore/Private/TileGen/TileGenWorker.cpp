@@ -5,7 +5,7 @@
 #include "HAL/RunnableThread.h"
 #include "Async/Async.h"
 
-FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& InTileList)
+FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& TileList)
 	: Params(InParams)
 	, Random(InParams.Seed)
 {
@@ -13,7 +13,7 @@ FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<FPri
 
 	// Asset loading must occur in the constructor since UObjects are not safely accessible from
 	// threads other than the game thread. Once this completes, the objects can be unloaded.
-	for (const FPrimaryAssetId& TileID : InTileList)
+	for (const FPrimaryAssetId& TileID : TileList)
 	{
 		if (const UTileDataAsset* TileDataAsset = AssetManager.GetPrimaryAssetObject<UTileDataAsset>(TileID))
 		{
@@ -106,13 +106,18 @@ float FTileGenWorker::Status() const
 	return Progress.GetValue() / (FMath::Max(Params.Size, 1) * 2.0f);
 }
 
-void FTileGenWorker::OutputPlan(TArray<FTilePlan>& OutPlan) const
+bool FTileGenWorker::IsComplete() const
+{
+	// Worker is complete if it has exited, was not stopped early, and did not report an error.
+	return bWorkComplete && !bStopThread && !bWithError;
+}
+
+template <> // Tile Plan specialization.
+void FTileGenWorker::GetPlan(TArray<FTilePlan>& OutPlan) const
 {
 	OutPlan.Empty();
 
-	// Only export the level plan if the thread completed naturally and without issue.
-	// If the thread was stopped or had an error, the plan should be empty.
-	if (bWorkComplete && !bStopThread && !bWithError)
+	if (IsComplete())
 	{
 		for (const FTileGenPlan& Plan : TilePlans)
 		{
@@ -121,32 +126,30 @@ void FTileGenWorker::OutputPlan(TArray<FTilePlan>& OutPlan) const
 	}
 }
 
-void FTileGenWorker::OutputBounds(TArray<FTileBound>& OutBounds) const
+template <> // Tile Bound specialization.
+void FTileGenWorker::GetPlan(TArray<FTileBound>& OutPlan) const
 {
-	OutBounds.Empty();
+	OutPlan.Empty();
 
-	// Only export the level plan bounds if the thread completed naturally and without issue.
-	// If the thread was stopped or had an error, the array should be empty.
-	if (bWorkComplete && !bStopThread && !bWithError)
+	if (IsComplete())
 	{
 		for (const FTileGenPlan& Plan : TilePlans)
 		{
-			OutBounds.Append(Plan.Bounds);
+			OutPlan.Append(Plan.Bounds);
 		}
 	}
 }
 
-void FTileGenWorker::OutputPortals(TArray<FTilePortal>& OutPortals) const
+template <> // Tile Portal specialization.
+void FTileGenWorker::GetPlan(TArray<FTilePortal>& OutPlan) const
 {
-	OutPortals.Empty();
+	OutPlan.Empty();
 
-	// Only export the level plan portals if the thread completed naturally and without issue.
-	// If the thread was stopped or had an error, the array should be empty.
-	if (bWorkComplete && !bStopThread && !bWithError)
+	if (IsComplete())
 	{
 		for (const FTileGenPlan& Plan : TilePlans)
 		{
-			OutPortals.Append(Plan.Portals);
+			OutPlan.Append(Plan.Portals);
 		}
 	}
 }

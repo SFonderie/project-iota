@@ -64,13 +64,37 @@ void UTileGenAsyncAction::Cancel()
 	}
 }
 
+void UTileGenAsyncAction::GetPlan(TArray<FTilePlan>& OutPlan) const
+{
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->GetPlan(OutPlan);
+	}
+}
+
+void UTileGenAsyncAction::GetBounds(TArray<FTileBound>& OutBounds) const
+{
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->GetPlan(OutBounds);
+	}
+}
+
+void UTileGenAsyncAction::GetPortals(TArray<FTilePortal>& OutPortals) const
+{
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->GetPlan(OutPortals);
+	}
+}
+
 void UTileGenAsyncAction::StartWorkerThread()
 {
-	// Create the worker, which actually handles most of the generation.
+	// Create the worker, which actually handles most of the generation. 
 	// See the Tile Gen Worker class for the actual generation code.
 	GenerationWorker = MakeShared<FTileGenWorker>(Params, TileAssetList);
 
-	// Bind an exit callback to the worker thread and then actually start it.
+	// Bind a callback to the generation worker and actually start it up.
 	if (GenerationWorker.IsValid())
 	{
 		GenerationWorker->OnExit.BindUObject(this, &UTileGenAsyncAction::NotifyComplete);
@@ -92,18 +116,10 @@ void UTileGenAsyncAction::StartWorkerThread()
 
 void UTileGenAsyncAction::NotifyComplete()
 {
-	if (GenerationWorker.IsValid())
+	if (GenerationWorker.IsValid() && GenerationWorker->IsComplete())
 	{
-		GenerationWorker->OutputPlan(CompletePlan);
-		GenerationWorker->OutputBounds(PlanBounds);
-		GenerationWorker->OutputPortals(PlanPortals);
-		GenerationWorker.Reset();
-
-		if (!CompletePlan.IsEmpty())
-		{
-			OnGenerationComplete.Broadcast();
-			return;
-		}
+		OnGenerationComplete.Broadcast();
+		return;
 	}
 
 	OnGenerationFailure.Broadcast();
