@@ -106,10 +106,9 @@ float FTileGenWorker::Status() const
 	return Progress.GetValue() / (FMath::Max(Params.Size, 1) * 2.0f);
 }
 
-void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan, TArray<FTileBound>& OutBounds) const
+void FTileGenWorker::OutputPlan(TArray<FTilePlan>& OutPlan) const
 {
 	OutPlan.Empty();
-	OutBounds.Empty();
 
 	// Only export the level plan if the thread completed naturally and without issue.
 	// If the thread was stopped or had an error, the plan should be empty.
@@ -118,11 +117,36 @@ void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan, TArray<FTileBound>& OutB
 		for (const FTileGenPlan& Plan : TilePlans)
 		{
 			OutPlan.Emplace(Plan.GetTilePlan());
+		}
+	}
+}
 
-			for (const FTileBound& Bound : Plan.Bounds)
-			{
-				OutBounds.Emplace(Bound);
-			}
+void FTileGenWorker::OutputBounds(TArray<FTileBound>& OutBounds) const
+{
+	OutBounds.Empty();
+
+	// Only export the level plan bounds if the thread completed naturally and without issue.
+	// If the thread was stopped or had an error, the array should be empty.
+	if (bWorkComplete && !bStopThread && !bWithError)
+	{
+		for (const FTileGenPlan& Plan : TilePlans)
+		{
+			OutBounds.Append(Plan.Bounds);
+		}
+	}
+}
+
+void FTileGenWorker::OutputPortals(TArray<FTilePortal>& OutPortals) const
+{
+	OutPortals.Empty();
+
+	// Only export the level plan portals if the thread completed naturally and without issue.
+	// If the thread was stopped or had an error, the array should be empty.
+	if (bWorkComplete && !bStopThread && !bWithError)
+	{
+		for (const FTileGenPlan& Plan : TilePlans)
+		{
+			OutPortals.Append(Plan.Portals);
 		}
 	}
 }

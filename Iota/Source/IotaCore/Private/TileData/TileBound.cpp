@@ -87,8 +87,10 @@ bool FTileBound::IsAxisSeparating(const FTileBound& A, const FTileBound& B, cons
 	FFloatInterval IntervalB = B.LineProjection(Axis);
 
 	// Axis can only be a separating axis if the projection intervals do not overlap.
-	// As such, neither bound of interval B can fall within interval A.
-	return !IntervalA.Contains(IntervalB.Min) && !IntervalA.Contains(IntervalB.Max);
+	// As such, neither bound of interval B can fall within interval A nor vice-versa.
+	bool CheckA = !IntervalA.Contains(IntervalB.Min) && !IntervalA.Contains(IntervalB.Max);
+	bool CheckB = !IntervalB.Contains(IntervalA.Min) && !IntervalB.Contains(IntervalA.Max);
+	return CheckA && CheckB;
 }
 
 FFloatInterval FTileBound::LineProjection(const FVector& Axis) const

@@ -47,7 +47,7 @@ public:
 	/**
 	 * Attempts to return the generated level plan as an array of Tile Plans. If the async action
 	 * has not completed or an error was thrown, this method will return an empty array.
-	 * 
+	 *
 	 * @return Level plan array.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Async Action")
@@ -59,13 +59,25 @@ public:
 	/**
 	 * Attempts to return the generated level plan bounding boxes. If the async action has not
 	 * completed or an error was thrown, this method will return an empty array.
-	 * 
+	 *
 	 * @return Level plan bounds array.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Async Action")
 	const TArray<FTileBound>& GetBounds() const
 	{
 		return PlanBounds;
+	}
+
+	/**
+	 * Attempts to return the generated level plan portals. If the async action has not completed
+	 * or an error was thrown, this method will return an empty array.
+	 *
+	 * @return Level plan portals array.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Async Action")
+	const TArray<FTilePortal>& GetPortals() const
+	{
+		return PlanPortals;
 	}
 
 private:
@@ -93,4 +105,7 @@ private:
 
 	/** Holds the level plan bounds. */
 	TArray<FTileBound> PlanBounds;
+
+	/** Holds the level plan portals. */
+	TArray<FTilePortal> PlanPortals;
 };
