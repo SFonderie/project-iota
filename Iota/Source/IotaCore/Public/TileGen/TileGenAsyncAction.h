@@ -51,9 +51,21 @@ public:
 	 * @return Level plan array.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Async Action")
-	virtual const TArray<FTilePlan>& GetPlan() const
+	const TArray<FTilePlan>& GetPlan() const
 	{
 		return CompletePlan;
+	}
+
+	/**
+	 * Attempts to return the generated level plan bounding boxes. If the async action has not
+	 * completed or an error was thrown, this method will return an empty array.
+	 * 
+	 * @return Level plan bounds array.
+	 */
+	UFUNCTION(BlueprintPure, Category = "Async Action")
+	const TArray<FTileBound>& GetBounds() const
+	{
+		return PlanBounds;
 	}
 
 private:
@@ -78,4 +90,7 @@ private:
 
 	/** Holds the completed level plan. */
 	TArray<FTilePlan> CompletePlan;
+
+	/** Holds the level plan bounds. */
+	TArray<FTileBound> PlanBounds;
 };

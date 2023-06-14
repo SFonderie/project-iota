@@ -106,9 +106,10 @@ float FTileGenWorker::Status() const
 	return Progress.GetValue() / (FMath::Max(Params.Size, 1) * 2.0f);
 }
 
-void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan) const
+void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan, TArray<FTileBound>& OutBounds) const
 {
 	OutPlan.Empty();
+	OutBounds.Empty();
 
 	// Only export the level plan if the thread completed naturally and without issue.
 	// If the thread was stopped or had an error, the plan should be empty.
@@ -117,6 +118,11 @@ void FTileGenWorker::Output(TArray<FTilePlan>& OutPlan) const
 		for (const FTileGenPlan& Plan : TilePlans)
 		{
 			OutPlan.Emplace(Plan.GetTilePlan());
+
+			for (const FTileBound& Bound : Plan.Bounds)
+			{
+				OutBounds.Emplace(Bound);
+			}
 		}
 	}
 }
@@ -196,16 +202,19 @@ bool FTileGenWorker::PlaceStopper(const FTilePortal& AttachPortal)
 
 	for (const FTileGenData& NewTile : TilePalettes[uint8(ETileScheme::Stopper)])
 	{
-		if (!NewTile.Portals.IsEmpty() && NewTile.Portals[0].CanConnect(AttachPortal))
+		for (const FTilePortal& NewPortal : NewTile.Portals)
 		{
-			FTransform NewTransform = FTilePortal::ConnectionTransform(NewTile.Portals[0], AttachPortal);
-
-			if (CanPlaceTile(NewTile, NewTransform))
+			if (NewPortal.CanConnect(AttachPortal))
 			{
-				// Add the stopper without any of the normal registry settings.
-				// Stoppers don't need to worry about portals or parents.
-				TilePlans.Emplace(NewTile, NewTransform);
-				return true;
+				FTransform NewTransform = FTilePortal::ConnectionTransform(NewPortal, AttachPortal);
+
+				if (CanPlaceTile(NewTile, NewTransform))
+				{
+					// Add the stopper without any of the normal registry settings.
+					// Stoppers don't need to worry about portals or parents.
+					TilePlans.Emplace(NewTile, NewTransform);
+					return true;
+				}
 			}
 		}
 	}

@@ -23,7 +23,7 @@ FTileBound::FTileBound(const FVector& InCenter, const FRotator& InRotation, cons
 FTileBound::FTileBound(const FTileBound& TileBound, const FTransform& Transform)
 	: Center(Transform.TransformPosition(TileBound.Center))
 	, Rotation(Transform.TransformRotation(TileBound.Rotation.Quaternion()).Rotator())
-	, Extent(Transform.GetScale3D()* TileBound.Extent)
+	, Extent(TileBound.Extent)
 {
 	// Copy constructor.
 }
@@ -94,14 +94,15 @@ bool FTileBound::IsAxisSeparating(const FTileBound& A, const FTileBound& B, cons
 FFloatInterval FTileBound::LineProjection(const FVector& Axis) const
 {
 	const float Signs[] = { -1, 1 };
+	const float Shrink = 1;
 
 	// Calculate the positions of the box vertices on the line axis using projection.
 	// Since the dot-product is distributive ( A * ( B + C ) = A * B + A * C ), we can
 	// pre-calculate the extent offsets and add them later.
 	float CenterDistance = Axis | Center;
-	float XOffset = Axis | (GetAxisX() * Extent.X);
-	float YOffset = Axis | (GetAxisY() * Extent.Y);
-	float ZOffset = Axis | (GetAxisZ() * Extent.Z);
+	float XOffset = Axis | (GetAxisX() * (Extent.X - Shrink));
+	float YOffset = Axis | (GetAxisY() * (Extent.Y - Shrink));
+	float ZOffset = Axis | (GetAxisZ() * (Extent.Z - Shrink));
 
 	FFloatInterval ProjectionInterval;
 

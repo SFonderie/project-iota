@@ -74,7 +74,7 @@ public:
 	 * Outputs the generated level plan. If the worker was stopped, exited with an error code, or
 	 * is still active, the given array will be returned empty.
 	 */
-	void Output(TArray<FTilePlan>& OutTilePlan) const;
+	void Output(TArray<FTilePlan>& OutPlan, TArray<FTileBound>& OutBounds) const;
 
 	/** 
 	 * Callback invoked when the worker exits.

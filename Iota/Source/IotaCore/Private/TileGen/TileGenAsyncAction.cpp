@@ -94,7 +94,7 @@ void UTileGenAsyncAction::NotifyComplete()
 {
 	if (GenerationWorker.IsValid())
 	{
-		GenerationWorker->Output(CompletePlan);
+		GenerationWorker->Output(CompletePlan, PlanBounds);
 		GenerationWorker.Reset();
 
 		if (!CompletePlan.IsEmpty())
