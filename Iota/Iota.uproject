@@ -12,6 +12,15 @@
 				"Engine",
 				"GameplayAbilities"
 			]
+		},
+		{
+			"Name": "IotaTile",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CoreUObject",
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
