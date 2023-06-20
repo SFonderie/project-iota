@@ -116,7 +116,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 					FPackageName::GetAssetPackageExtension()
 				);
 
-				// Save the package.
+				// Attempt to actually save the package and its contents.
 				UPackage::SavePackage(AssetPackage, DataAssetObject, *FileName, FSavePackageArgs());
 			}
 		}

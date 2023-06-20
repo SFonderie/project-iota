@@ -27,7 +27,7 @@ public:
 
 	/** Export the tile with these preferred schemes. */
 	UPROPERTY(Category = "ExportLevel", EditAnywhere, meta = (Bitmask, BitmaskEnum = "/Script/IotaTile.ETileScheme"))
-	int32 PreferredSchemes = 1 << ETileScheme::Connection;
+	int32 PreferredSchemes = 1 << ETileScheme::Connector;
 
 	/** Tileset to which the tile belongs. */
 	UPROPERTY(Category = "ExportData", EditAnywhere, meta = (Categories = "Tileset"))

@@ -24,7 +24,7 @@ public:
 
 	/** Preferred tile schemes. */
 	UPROPERTY(Category = "TileLevel", EditAnywhere, meta = (Bitmask, BitmaskEnum = "/Script/IotaTile.ETileScheme"))
-	int32 Schemes = 1 << ETileScheme::Connection;
+	int32 Schemes = 1 << ETileScheme::Connector;
 
 	/** Tileset to which the tile belongs. */
 	UPROPERTY(AssetRegistrySearchable, Category = "Categories", EditAnywhere, meta = (Categories = "Tileset"))

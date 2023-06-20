@@ -86,8 +86,7 @@ bool FTileBound::IsAxisSeparating(const FTileBound& A, const FTileBound& B, cons
 	FFloatInterval IntervalA = A.LineProjection(Axis);
 	FFloatInterval IntervalB = B.LineProjection(Axis);
 
-	// Axis can only be a separating axis if the projection intervals do not overlap.
-	// These checks assume the provided intervals are valid, which they always should be.
+	// Axis is a separating axis if the projection intervals do not overlap.
 	return (IntervalA.Max < IntervalB.Min) || (IntervalB.Max < IntervalA.Min);
 }
 

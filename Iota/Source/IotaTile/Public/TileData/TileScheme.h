@@ -17,9 +17,9 @@ enum class ETileScheme : uint8
 
 	/**
 	 * Indicates that a tile should be used to bridge between other tiles.
-	 * Connection tiles should have at least two portals.
+	 * Connector tiles should have at least two portals.
 	 */
-	Connection,
+	Connector,
 
 	/**
 	 * Indicates that a tile should be used to branch the level or as an arena.
@@ -35,9 +35,9 @@ enum class ETileScheme : uint8
 
 	/**
 	 * Indicates that a tile should be used to seal-off empty portals.
-	 * Stopper tiles should have at most one portal.
+	 * Terminal tiles should have at most one portal.
 	 */
-	Stopper,
+	Terminal,
 
 	/**
 	 * Indicates that a tile should be used to determine a level end point.
