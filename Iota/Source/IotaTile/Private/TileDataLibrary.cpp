@@ -29,7 +29,7 @@ FTilePortal UTileDataLibrary::TransformTilePortal(const FTilePortal& TilePortal,
 	return FTilePortal(TilePortal, Transform);
 }
 
-void UTileDataLibrary::MakeTileSequence(const FTileGenParams& Parameters, TArray<ETileScheme>& Sequence)
+void UTileDataLibrary::GetTileSequence(const FTileGenParams& Parameters, TArray<ETileScheme>& Sequence)
 {
 	Parameters.GetTileSequence(Sequence);
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/EnumRange.h"
 #include "TileScheme.generated.h"
 
 /** Defines different tile functions within a tileset. */
@@ -51,8 +52,16 @@ enum class ETileScheme : uint8
 	Count UMETA(Hidden),
 };
 
+ENUM_RANGE_BY_COUNT(ETileScheme, ETileScheme::Count);
+
 /** @return Scheme as its underlying byte value. */
-uint8 IOTATILE_API operator*(ETileScheme Scheme);
+constexpr uint8 IOTATILE_API operator*(ETileScheme Scheme)
+{
+	return uint8(Scheme);
+}
 
 /** @return Integer shifted by the given tile scheme. */
-int32 IOTATILE_API operator<<(int32 Integer, ETileScheme Scheme);
+constexpr int32 IOTATILE_API operator<<(int32 Integer, ETileScheme Scheme)
+{
+	return Integer << uint8(Scheme);
+}

@@ -26,7 +26,7 @@ public:
 	 *
 	 * @return The actor transform converted into a data-only form.
 	 */
-	UFUNCTION(BlueprintPure, Category = "TilePortal")
+	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TilePortal")
 	FTilePortal GetTilePortal() const;
 
 private:

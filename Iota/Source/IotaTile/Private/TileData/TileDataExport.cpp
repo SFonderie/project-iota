@@ -75,7 +75,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 			FString PackageName = TEXT("/Game/TileData/") + TilesetName + TEXT("/") + AssetName;
 
 			// Create a new package for the tile data asset.
-			UPackage* NewPackage = CreatePackage(nullptr, *PackageName);
+			UPackage* NewPackage = CreatePackage(*PackageName);
 			NewPackage->FullyLoad();
 
 			// Create the actual tile data asset, register it, and then save the reference.

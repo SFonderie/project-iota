@@ -24,7 +24,7 @@ public:
 	 *
 	 * @return The actor bounding box converted into a data-only form.
 	 */
-	UFUNCTION(BlueprintPure, Category = "TileBound")
+	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TileBound")
 	FTileBound GetTileBound() const;
 
 private:
