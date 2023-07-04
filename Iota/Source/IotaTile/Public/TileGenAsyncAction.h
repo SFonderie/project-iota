@@ -26,7 +26,7 @@ public:
 	 * @return Level generation handle.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "LevelGeneration", meta = (BlueprintInternalUseOnly = true, WorldContext = "WorldContextObject"))
-	static UTileGenAsyncAction* StartGeneration(const UObject* WorldContextObject, const FTileGenParams& Parameters);
+	static UTileGenAsyncAction* StartGeneration(UObject* WorldContextObject, const FTileGenParams& Parameters);
 
 	/** Blueprint-accessible generation callback event. */
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileGenAsyncEvent);
@@ -57,7 +57,7 @@ private:
 
 	/** World context object passed to level streams. */
 	UPROPERTY()
-	TObjectPtr<const UObject> WorldContextObject;
+	TObjectPtr<UObject> WorldContextObject;
 
 	/** Generation parameters. */
 	FTileGenParams Parameters;

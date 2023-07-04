@@ -7,7 +7,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenAsyncAction)
 
-UTileGenAsyncAction* UTileGenAsyncAction::StartGeneration(const UObject* WorldContextObject, const FTileGenParams& Parameters)
+UTileGenAsyncAction* UTileGenAsyncAction::StartGeneration(UObject* WorldContextObject, const FTileGenParams& Parameters)
 {
 	UTileGenAsyncAction* NewAction = NewObject<UTileGenAsyncAction>();
 	NewAction->RegisterWithGameInstance(WorldContextObject);

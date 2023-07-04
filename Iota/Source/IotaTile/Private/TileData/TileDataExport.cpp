@@ -72,7 +72,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 
 			// Create the package name from the level and a default folder.
 			FString AssetName = GetWorld()->GetMapName() + TEXT("_TileData");
-			FString PackageName = TEXT("/Game/TileData/") + TilesetName + TEXT("/") + AssetName;
+			FString PackageName = TEXT("/Game/TileData/") + TilesetName + TEXT("/Tiles/") + AssetName;
 
 			// Create a new package for the tile data asset.
 			UPackage* NewPackage = CreatePackage(*PackageName);
