@@ -61,7 +61,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
-	if (GIsEditor)
+	if (GIsEditor && GetWorld())
 	{
 		if (DataAsset.IsNull() && bAutoCreateAsset)
 		{
