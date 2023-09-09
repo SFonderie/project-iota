@@ -64,6 +64,20 @@ void UTileGenAsyncAction::Cancel()
 	}
 }
 
+void UTileGenAsyncAction::GetCompletePlan(TArray<FTilePlan>& TilePlans, TArray<FTileBound>& TileBounds, TArray<FTilePortal>& TilePortals) const
+{
+	TilePlans.Empty();
+	TileBounds.Empty();
+	TilePortals.Empty();
+
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker->GetPlan(TilePlans);
+		GenerationWorker->GetPlan(TileBounds);
+		GenerationWorker->GetPlan(TilePortals);
+	}
+}
+
 void UTileGenAsyncAction::NotifyAssetsLoaded()
 {
 	// Create the worker, which actually handles most of the generation. 

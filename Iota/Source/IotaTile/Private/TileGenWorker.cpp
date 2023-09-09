@@ -153,8 +153,8 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 {
 	if (TilePlans.IsEmpty())
 	{
-		// No plans, so add the tile as-is as the first.
-		TilePlans.Emplace(NewTile, FTransform::Identity);
+		// No plans yet, so add the first tile as-is at the parameters' origin point.
+		TilePlans.Emplace(NewTile, FTransform(Parameters.Rotation, Parameters.Position));
 		return true;
 	}
 

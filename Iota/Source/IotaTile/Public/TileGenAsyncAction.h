@@ -10,6 +10,10 @@
 struct FStreamableHandle;
 class FTileGenWorker;
 
+struct FTilePlan;
+struct FTileBound;
+struct FTilePortal;
+
 /** Asynchronous action that manages level generation. */
 UCLASS()
 class IOTATILE_API UTileGenAsyncAction : public UCancellableAsyncAction
@@ -44,6 +48,17 @@ public:
 
 	/** Closes generation. */
 	virtual void Cancel() override;
+
+	/**
+	 * Attempts to output the generated list of level plans, bounds, and portals. If generation
+	 * failed or has yet to complete, this method will return empty arrays.
+	 * 
+	 * @param TilePlans Array of generated level plans.
+	 * @param TileBounds Array of generated level bounding boxes.
+	 * @param TilePortals Array of generated level plan portals.
+	 */
+	UFUNCTION(BlueprintPure = false, Category = "LevelGeneration")
+	void GetCompletePlan(TArray<FTilePlan>& TilePlans, TArray<FTileBound>& TileBounds, TArray<FTilePortal>& TilePortals) const;
 
 private:
 
