@@ -22,10 +22,10 @@ public:
 	 * Creates a new generation worker with the given parameters and tileset.
 	 * Called on the source thread prior to the runnable thread's creation.
 	 *
-	 * @param InParams Parameters used for tile generation.
+	 * @param Parameters Parameters used for tile generation.
 	 * @param TileList Tile data asset primary IDs used to get loaded data.
 	 */
-	FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& TileList);
+	FTileGenWorker(const FTileGenParams& Parameters, const TArray<FPrimaryAssetId>& TileList);
 
 	/**
 	 * Safely discards the worker and its thread. If the thread is still running when the worker is
@@ -144,7 +144,7 @@ private:
 private:
 
 	/** Generation parameters. */
-	const FTileGenParams Parameters;
+	const FTileGenParams Params;
 
 	/** Pointer to the actual thread. */
 	FRunnableThread* Thread = nullptr;

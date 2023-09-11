@@ -7,14 +7,14 @@
 #include "TileData/TileGenParams.h"
 #include "TileGenAsyncAction.generated.h"
 
+struct FPrimaryAssetId;
 struct FStreamableHandle;
+
 class FTileGenWorker;
+class ULevelStreaming;
+class UWorld;
 
-struct FTilePlan;
-struct FTileBound;
-struct FTilePortal;
-
-/** Asynchronous action that manages level generation. */
+/** Manages the generation and loading of a complete tile level. */
 UCLASS()
 class IOTATILE_API UTileGenAsyncAction : public UCancellableAsyncAction
 {
@@ -23,14 +23,14 @@ class IOTATILE_API UTileGenAsyncAction : public UCancellableAsyncAction
 public:
 
 	/**
-	 * Starts level generation using the provided parameters.
+	 * Generates a new tile level and loads it into the world using the given parameters.
 	 *
-	 * @param WorldContext World context object.
-	 * @param Parameters Level generation parameters.
-	 * @return Level generation handle.
+	 * @param WorldContextObject World context object used to determine the level world.
+	 * @param Parameters Generation parameters used to characterize the new level.
+	 * @return Generator handle for managing the new level.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "LevelGeneration", meta = (BlueprintInternalUseOnly = true, WorldContext = "WorldContextObject"))
-	static UTileGenAsyncAction* StartGeneration(UObject* WorldContextObject, const FTileGenParams& Parameters);
+	static UTileGenAsyncAction* GenerateTileLevel(UObject* WorldContextObject, const FTileGenParams& Parameters);
 
 	/** Blueprint-accessible generation callback event. */
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileGenAsyncEvent);
@@ -43,24 +43,16 @@ public:
 	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Failed")
 	FTileGenAsyncEvent OnGenerationFailure;
 
-	/** Initiates generation. */
+	/** Initiates the generation process. */
 	virtual void Activate() override;
 
-	/** Closes generation. */
+	/** Cancels the generation process and unloads any loaded tiles. */
 	virtual void Cancel() override;
 
-	/**
-	 * Attempts to output the generated list of level plans, bounds, and portals. If generation
-	 * failed or has yet to complete, this method will return empty arrays.
-	 * 
-	 * @param TilePlans Array of generated level plans.
-	 * @param TileBounds Array of generated level bounding boxes.
-	 * @param TilePortals Array of generated level plan portals.
-	 */
-	UFUNCTION(BlueprintPure = false, Category = "LevelGeneration")
-	void GetCompletePlan(TArray<FTilePlan>& TilePlans, TArray<FTileBound>& TileBounds, TArray<FTilePortal>& TilePortals) const;
-
 private:
+
+	/** Invoked by the activate method to begin loading assets. */
+	void NotifyProcessStart();
 
 	/** Invoked by the asset manager to begin the generation worker thread. */
 	void NotifyAssetsLoaded();
@@ -70,14 +62,19 @@ private:
 
 private:
 
-	/** World context object passed to level streams. */
-	UPROPERTY()
-	TObjectPtr<UObject> WorldContextObject;
+	/** Level world context. */
+	TObjectPtr<UWorld> World;
 
 	/** Generation parameters. */
-	FTileGenParams Parameters;
+	FTileGenParams Params;
 
-	/** Unloaded tile generator list. */
+	/** World ID number. */
+	int32 SubsystemID = 0;
+
+	/** Indicates that the generator has activated. */
+	bool bHasActivated = false;
+
+	/** Unloaded tile data asset list. */
 	TArray<FPrimaryAssetId> TileAssetList;
 
 	/** Handle used to track data asset loading. */
@@ -85,4 +82,7 @@ private:
 
 	/** Handle used to track the generation worker. */
 	TSharedPtr<FTileGenWorker> GenerationWorker;
+
+	/** Loaded tile level list. */
+	TArray<ULevelStreaming*> TileStreams;
 };

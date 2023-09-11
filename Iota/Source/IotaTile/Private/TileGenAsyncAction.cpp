@@ -1,22 +1,68 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileGenAsyncAction.h"
-#include "Engine/AssetManager.h"
-#include "TileData/TileDataAsset.h"
+#include "TileGenSubsystem.h"
 #include "TileGenWorker.h"
+#include "Engine/Engine.h"
+#include "Engine/AssetManager.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "TileData/TileDataAsset.h"
+#include "TileData/TilePlan.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenAsyncAction)
 
-UTileGenAsyncAction* UTileGenAsyncAction::StartGeneration(UObject* WorldContextObject, const FTileGenParams& Parameters)
+UTileGenAsyncAction* UTileGenAsyncAction::GenerateTileLevel(UObject* WorldContextObject, const FTileGenParams& Parameters)
 {
-	UTileGenAsyncAction* NewAction = NewObject<UTileGenAsyncAction>();
-	NewAction->RegisterWithGameInstance(WorldContextObject);
-	NewAction->WorldContextObject = WorldContextObject;
-	NewAction->Parameters = Parameters;
-	return NewAction;
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		UTileGenAsyncAction* NewAction = NewObject<UTileGenAsyncAction>();
+		NewAction->RegisterWithGameInstance(World->GetGameInstance());
+		NewAction->Params = Parameters;
+		NewAction->World = World;
+
+		// Registration with the world ensures the action is cancelled on world shutdown.
+		// The returned ID number also ensures world-unique names for loaded tile levels.
+		UTileGenSubsystem* Subsystem = World->GetSubsystem<UTileGenSubsystem>();
+		Subsystem->RegisterGenerator(NewAction, NewAction->SubsystemID);
+		return NewAction;
+	}
+
+	return nullptr;
 }
 
 void UTileGenAsyncAction::Activate()
+{
+	if (!bHasActivated)
+	{
+		NotifyProcessStart();
+		bHasActivated = true;
+	}
+}
+
+void UTileGenAsyncAction::Cancel()
+{
+	Super::Cancel();
+
+	if (DataAssetHandle.IsValid())
+	{
+		DataAssetHandle->CancelHandle();
+		DataAssetHandle.Reset();
+	}
+
+	if (GenerationWorker.IsValid())
+	{
+		GenerationWorker.Reset();
+	}
+
+	for (ULevelStreaming* Stream : TileStreams)
+	{
+		Stream->SetIsRequestingUnloadAndRemoval(true);
+	}
+
+	TileStreams.Empty();
+}
+
+void UTileGenAsyncAction::NotifyProcessStart()
 {
 	UAssetManager& AssetManager = UAssetManager::Get();
 
@@ -35,7 +81,7 @@ void UTileGenAsyncAction::Activate()
 		{
 			AssetDataTag.FromExportString(AssetDataRawString);
 
-			if (AssetDataTag == Parameters.Tileset)
+			if (AssetDataTag == Params.Tileset)
 			{
 				TileAssetList.Emplace(AssetData.GetPrimaryAssetId());
 			}
@@ -48,41 +94,11 @@ void UTileGenAsyncAction::Activate()
 	DataAssetHandle = AssetManager.LoadPrimaryAssets(TileAssetList, TArray<FName>(), Callback);
 }
 
-void UTileGenAsyncAction::Cancel()
-{
-	Super::Cancel();
-
-	if (DataAssetHandle.IsValid())
-	{
-		DataAssetHandle->CancelHandle();
-		DataAssetHandle.Reset();
-	}
-
-	if (GenerationWorker.IsValid())
-	{
-		GenerationWorker.Reset();
-	}
-}
-
-void UTileGenAsyncAction::GetCompletePlan(TArray<FTilePlan>& TilePlans, TArray<FTileBound>& TileBounds, TArray<FTilePortal>& TilePortals) const
-{
-	TilePlans.Empty();
-	TileBounds.Empty();
-	TilePortals.Empty();
-
-	if (GenerationWorker.IsValid())
-	{
-		GenerationWorker->GetPlan(TilePlans);
-		GenerationWorker->GetPlan(TileBounds);
-		GenerationWorker->GetPlan(TilePortals);
-	}
-}
-
 void UTileGenAsyncAction::NotifyAssetsLoaded()
 {
 	// Create the worker, which actually handles most of the generation. 
 	// See the Tile Gen Worker class for the actual generation code.
-	GenerationWorker = MakeShared<FTileGenWorker>(Parameters, TileAssetList);
+	GenerationWorker = MakeShared<FTileGenWorker>(Params, TileAssetList);
 
 	// Bind a callback to the generation worker and actually start it up.
 	if (GenerationWorker.IsValid())
@@ -107,6 +123,36 @@ void UTileGenAsyncAction::NotifyWorkerComplete()
 {
 	if (GenerationWorker.IsValid() && GenerationWorker->IsComplete())
 	{
+		TArray<FTilePlan> TilePlans;
+		GenerationWorker->GetPlan(TilePlans);
+		int32 Count = 0;
+
+		for (const FTilePlan& Plan : TilePlans)
+		{
+			// Generate a unique level name using the world ID number and the tile index. Streamed
+			// levels are client-side, so providing a name override ensures that loaded actors are
+			// properly loaded on the server.
+			FString NameOverride = FString::Printf(TEXT("TileLevel_%i_Tile_%i"), SubsystemID, Count);
+
+			// Extract local values from the current tile plan.
+			FTransform TileTransform(Plan.Rotation, Plan.Position);
+			FString TilePackage = Plan.Level.GetLongPackageName();
+
+			// Condense the streaming parameters.
+			ULevelStreamingDynamic::FLoadLevelInstanceParams StreamParams(World, TilePackage, TileTransform);
+			StreamParams.OptionalLevelNameOverride = &NameOverride;
+			bool bSuccess = false;
+
+			// Creates a new dynamic level stream and returns the result.
+			ULevelStreaming* NewStream = ULevelStreamingDynamic::LoadLevelInstance(StreamParams, bSuccess);
+
+			if (NewStream && bSuccess)
+			{
+				TileStreams.Emplace(NewStream);
+				Count++;
+			}
+		}
+
 		OnGenerationComplete.Broadcast();
 		return;
 	}

@@ -8,9 +8,9 @@
 #include "HAL/RunnableThread.h"
 #include "Async/Async.h"
 
-FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<FPrimaryAssetId>& TileList)
-	: Parameters(InParams)
-	, RandomStream(InParams.Seed)
+FTileGenWorker::FTileGenWorker(const FTileGenParams& Parameters, const TArray<FPrimaryAssetId>& TileList)
+	: Params(Parameters)
+	, RandomStream(Parameters.Seed)
 {
 	UAssetManager& AssetManager = UAssetManager::Get();
 
@@ -18,8 +18,8 @@ FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<FPri
 	{
 		if (const UTileDataAsset* TileDataAsset = AssetManager.GetPrimaryAssetObject<UTileDataAsset>(TileID))
 		{
-			bool bMainObjective = TileDataAsset->Objectives.HasTagExact(InParams.MainObjective);
-			bool bSideObjective = TileDataAsset->Objectives.HasAnyExact(InParams.SideObjectives);
+			bool bMainObjective = TileDataAsset->Objectives.HasTagExact(Params.MainObjective);
+			bool bSideObjective = TileDataAsset->Objectives.HasAnyExact(Params.SideObjectives);
 			bool bZeroObjective = TileDataAsset->Objectives.IsEmpty();
 
 			for (ETileScheme Scheme : TEnumRange<ETileScheme>())
@@ -57,7 +57,7 @@ FTileGenWorker::~FTileGenWorker()
 
 void FTileGenWorker::Start()
 {
-	Thread = FRunnableThread::Create(this, TEXT("TileGenerationThread"));
+	Thread = FRunnableThread::Create(this, TEXT("TileGenThread"));
 }
 
 bool FTileGenWorker::Init()
@@ -68,10 +68,10 @@ bool FTileGenWorker::Init()
 uint32 FTileGenWorker::Run()
 {
 	TArray<ETileScheme> Sequence;
-	Parameters.GetTileSequence(Sequence);
+	Params.GetTileSequence(Sequence);
 
 	// Core loop. Builds out the main level path using the tile sequence.
-	for (int32 Tile = 0; Tile < Parameters.Length && !bStopThread; Tile++)
+	for (int32 Tile = 0; Tile < Params.Length && !bStopThread; Tile++)
 	{
 		if (!PlaceNewTile(Sequence[Tile]))
 		{
@@ -82,7 +82,7 @@ uint32 FTileGenWorker::Run()
 
 	// Second loop. Goes through each portal on each planned tile and attempts to add a terminal
 	// to each open portal. Doing so builds out the plan array, so a numeric for must be used.
-	for (int32 Tile = 0; Tile < Parameters.Length && !bStopThread; Tile++)
+	for (int32 Tile = 0; Tile < Params.Length && !bStopThread; Tile++)
 	{
 		for (int32 Index = 0; Index < TilePlans[Tile].Portals.Num() && !bStopThread; Index++)
 		{
@@ -154,7 +154,7 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 	if (TilePlans.IsEmpty())
 	{
 		// No plans yet, so add the first tile as-is at the parameters' origin point.
-		TilePlans.Emplace(NewTile, FTransform(Parameters.Rotation, Parameters.Position));
+		TilePlans.Emplace(NewTile, FTransform(Params.Rotation, Params.Position));
 		return true;
 	}
 
@@ -166,7 +166,7 @@ bool FTileGenWorker::TryPlaceTile(const FTileGenData& NewTile, ETileScheme Schem
 
 	// Traverse the tile plan array as if it was a tree and add any open portals to the list.
 	// Traversal will continue until a null parent is found or the branch length is reached.
-	while (0 <= PlanIndex && PlanIndex < TilePlans.Num() && Depth < Parameters.Branch)
+	while (0 <= PlanIndex && PlanIndex < TilePlans.Num() && Depth < Params.Branch)
 	{
 		const FTileGenPlan& PlanValue = TilePlans[PlanIndex];
 
@@ -291,7 +291,7 @@ float FTileGenWorker::GetProgress() const
 {
 	// Divide by double the size because the loop runs twice: once to generate the plan, once to
 	// place stoppers. Ensure that the length won't cause a divide by zero error.
-	return Progress.GetValue() / (FMath::Max(Parameters.Length, 1) * 2.0f);
+	return Progress.GetValue() / (FMath::Max(Params.Length, 1) * 2.0f);
 }
 
 int32 FTileGenWorker::GetErrorCode() const
