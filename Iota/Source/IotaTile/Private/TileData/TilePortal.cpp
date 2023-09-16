@@ -7,7 +7,7 @@
 FTilePortal::FTilePortal()
 	: Location(0, 0, 0)
 	, Direction(1, 0, 0)
-	, PlaneSize(3, 3)
+	, PlaneSize(4, 3)
 {
 	// Default constructor.
 }

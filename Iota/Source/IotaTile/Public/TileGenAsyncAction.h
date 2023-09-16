@@ -7,10 +7,15 @@
 #include "TileData/TileGenParams.h"
 #include "TileGenAsyncAction.generated.h"
 
+struct FPrimaryAssetId;
 struct FStreamableHandle;
-class FTileGenWorker;
 
-/** Asynchronous action that manages level generation. */
+class ATileGenDoor;
+class FTileGenWorker;
+class ULevelStreaming;
+class UWorld;
+
+/** Manages the generation and loading of a complete tile level. */
 UCLASS()
 class IOTATILE_API UTileGenAsyncAction : public UCancellableAsyncAction
 {
@@ -19,14 +24,14 @@ class IOTATILE_API UTileGenAsyncAction : public UCancellableAsyncAction
 public:
 
 	/**
-	 * Starts level generation using the provided parameters.
+	 * Generates a new tile level and loads it into the world using the given parameters.
 	 *
-	 * @param WorldContext World context object.
-	 * @param Parameters Level generation parameters.
-	 * @return Level generation handle.
+	 * @param WorldContextObject World context object used to determine the level world.
+	 * @param Parameters Generation parameters used to characterize the new level.
+	 * @return Generator handle for managing the new level.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "LevelGeneration", meta = (BlueprintInternalUseOnly = true, WorldContext = "WorldContextObject"))
-	static UTileGenAsyncAction* StartGeneration(const UObject* WorldContextObject, const FTileGenParams& Parameters);
+	static UTileGenAsyncAction* GenerateTileLevel(UObject* WorldContextObject, const FTileGenParams& Parameters);
 
 	/** Blueprint-accessible generation callback event. */
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTileGenAsyncEvent);
@@ -39,13 +44,16 @@ public:
 	UPROPERTY(BlueprintAssignable, DisplayName = "Generation Failed")
 	FTileGenAsyncEvent OnGenerationFailure;
 
-	/** Initiates generation. */
+	/** Initiates the generation process. */
 	virtual void Activate() override;
 
-	/** Closes generation. */
+	/** Cancels the generation process and unloads any loaded tiles. */
 	virtual void Cancel() override;
 
 private:
+
+	/** Invoked by the activate method to begin loading assets. */
+	void NotifyProcessStart();
 
 	/** Invoked by the asset manager to begin the generation worker thread. */
 	void NotifyAssetsLoaded();
@@ -53,16 +61,24 @@ private:
 	/** Invoked by the generation worker to begin the level loading process. */
 	void NotifyWorkerComplete();
 
+	/** Adds doors to the level plan. */
+	void GenerateDoors();
+
 private:
 
-	/** World context object passed to level streams. */
-	UPROPERTY()
-	TObjectPtr<const UObject> WorldContextObject;
+	/** Level world context. */
+	TObjectPtr<UWorld> World;
 
 	/** Generation parameters. */
-	FTileGenParams Parameters;
+	FTileGenParams Params;
 
-	/** Unloaded tile generator list. */
+	/** World ID number. */
+	int32 SubsystemID = 0;
+
+	/** Indicates that the generator has activated. */
+	bool bHasActivated = false;
+
+	/** Unloaded tile data asset list. */
 	TArray<FPrimaryAssetId> TileAssetList;
 
 	/** Handle used to track data asset loading. */
@@ -70,4 +86,10 @@ private:
 
 	/** Handle used to track the generation worker. */
 	TSharedPtr<FTileGenWorker> GenerationWorker;
+
+	/** Loaded tile level list. */
+	TArray<ULevelStreaming*> TileStreams;
+
+	/** Door actors list. */
+	TArray<ATileGenDoor*> DoorActors;
 };

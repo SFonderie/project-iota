@@ -34,6 +34,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "Objective"))
 	FGameplayTagContainer SideObjectives;
 
+	/** Global origin point for the generated level. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector Position;
+
+	/** Global rotation applied to the generated level. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FRotator Rotation;
+
 	/** 
 	 * Number of main objective tiles to place in the level.
 	 * 
