@@ -1,6 +1,7 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
 #include "TileGenAsyncAction.h"
+#include "TileGenDoor.h"
 #include "TileGenSubsystem.h"
 #include "TileGenWorker.h"
 #include "Engine/Engine.h"
@@ -153,9 +154,88 @@ void UTileGenAsyncAction::NotifyWorkerComplete()
 			}
 		}
 
+		GenerateDoors();
+
 		OnGenerationComplete.Broadcast();
 		return;
 	}
 
 	OnGenerationFailure.Broadcast();
+}
+
+void UTileGenAsyncAction::GenerateDoors()
+{
+	UAssetManager& AssetManager = UAssetManager::Get();
+
+	TArray<FAssetData> DoorAssetData;
+	AssetManager.GetPrimaryAssetDataList(ATileGenDoor::StaticClass()->GetFName(), DoorAssetData);
+
+	TMultiMap<FIntPoint, UClass*> DoorClasses;
+
+	for (const FAssetData& AssetData : DoorAssetData)
+	{
+		TSubclassOf<ATileGenDoor> DoorClass = AssetManager.GetPrimaryAssetObjectClass<ATileGenDoor>(AssetData.GetPrimaryAssetId());
+		ATileGenDoor* DoorObject = DoorClass.GetDefaultObject();
+
+		if (DoorObject && DoorObject->Tilesets.HasTag(Params.Tileset))
+		{
+			DoorClasses.Emplace(DoorObject->DoorSize, DoorClass);
+		}
+	}
+
+	TArray<FTilePortal> TilePortals, TruePortals, FakePortals;
+	GenerationWorker->GetPlan(TilePortals);
+
+	// Extremely hacky way to figure out which portals are fake (not connected to another tile) or
+	// true (connected to another tile) via brute force search. Future versions should determine
+	// portal status during generation and export it out.
+	for (FTilePortal& Portal : TilePortals)
+	{
+		bool bFake = true;
+
+		// Search the list of fake portals for a location match. If one is found, the portal is
+		// a legitimate portal and thus can be added to the true list.
+		for (int32 Fake = 0; Fake < FakePortals.Num(); Fake++)
+		{
+			if (FVector::PointsAreSame(FakePortals[Fake].Location, Portal.Location))
+			{
+				TruePortals.Emplace(Portal);
+				FakePortals.RemoveAtSwap(Fake);
+				bFake = false;
+				break;
+			}
+		}
+
+		if (bFake)
+		{
+			FakePortals.Emplace(Portal);
+		}
+	}
+
+	for (const FTilePortal& Portal : TruePortals)
+	{
+		TArray<UClass*> Doors;
+		DoorClasses.MultiFind(Portal.PlaneSize, Doors);
+		UClass* RandomDoor = Doors[FMath::RandRange(0, Doors.Num() - 1)];
+
+		FVector Position = Portal.Location - FVector(0, 0, Portal.PlaneSize.Y * 50);
+		FRotator Rotation = FRotationMatrix::MakeFromX(Portal.Direction).Rotator();
+
+		DoorActors.Add(World->SpawnActorAbsolute<ATileGenDoor>(RandomDoor, FTransform(Rotation, Position)));
+	}
+
+	for (const FTilePortal& Portal : FakePortals)
+	{
+		TArray<UClass*> Doors;
+		DoorClasses.MultiFind(Portal.PlaneSize, Doors);
+		UClass* RandomDoor = Doors[FMath::RandRange(0, Doors.Num() - 1)];
+
+		FVector Position = Portal.Location - FVector(0, 0, Portal.PlaneSize.Y * 50);
+		FRotator Rotation = FRotationMatrix::MakeFromX(Portal.Direction).Rotator();
+
+		ATileGenDoor* FakeDoor = World->SpawnActorAbsolute<ATileGenDoor>(RandomDoor, FTransform(Rotation, Position));
+		FakeDoor->bIsLocked = true;
+
+		DoorActors.Add(FakeDoor);
+	}
 }

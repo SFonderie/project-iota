@@ -10,6 +10,7 @@
 struct FPrimaryAssetId;
 struct FStreamableHandle;
 
+class ATileGenDoor;
 class FTileGenWorker;
 class ULevelStreaming;
 class UWorld;
@@ -60,6 +61,9 @@ private:
 	/** Invoked by the generation worker to begin the level loading process. */
 	void NotifyWorkerComplete();
 
+	/** Adds doors to the level plan. */
+	void GenerateDoors();
+
 private:
 
 	/** Level world context. */
@@ -85,4 +89,7 @@ private:
 
 	/** Loaded tile level list. */
 	TArray<ULevelStreaming*> TileStreams;
+
+	/** Door actors list. */
+	TArray<ATileGenDoor*> DoorActors;
 };
