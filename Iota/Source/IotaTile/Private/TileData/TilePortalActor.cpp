@@ -97,7 +97,12 @@ FTilePortal ATilePortalActor::GetTilePortal() const
 		FMath::FloorToInt32(PlaneExtent.Z / 50)
 	);
 
-	return FTilePortal(GetActorLocation(), Forward, PlaneSize);
+	// Use the rounded plane extent to re-center the portal on the floor.
+	// Doing so makes spawning tile doors much more intuitive for designers.
+	FVector Location = GetActorLocation() - FVector(0, 0, PlaneSize.Y * 50);
+
+	// Return the resulting tile portal structure.
+	return FTilePortal(Location, Forward, PlaneSize);
 }
 
 #if WITH_EDITOR
