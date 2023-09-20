@@ -20,9 +20,6 @@ struct FTileGenData
 	/** List of tile collision bounds. */
 	TArray<FTileBound> Bounds;
 
-	/** Defines an empty data struct. */
-	FTileGenData();
-
 	/** Copies values from the given tile data asset. */
 	FTileGenData(const UTileDataAsset* DataAsset);
 

@@ -64,6 +64,12 @@ uint32 FTileGenWorker::Run()
 		}
 	}
 
+	// Second loop. Goes through each main tile and adds terminal seals.
+	for (int32 Tile = 0; Tile < Params.Length && !bStopThread; Tile++)
+	{
+		PlaceTerminals(Tile);
+	}
+
 	return 0;
 }
 
@@ -198,6 +204,53 @@ bool FTileGenWorker::CanPlaceTile(const FTileGenData& NewTile, const FTransform&
 	return true;
 }
 
+void FTileGenWorker::PlaceTerminals(int32 PlanIndex)
+{
+	for (int32 Portal = 0; Portal < TilePlans[PlanIndex].Portals.Num() && !bStopThread; Portal++)
+	{
+		if (TilePlans[PlanIndex].IsOpenPortal(Portal))
+		{
+			TryPlaceTerminal(PlanIndex, Portal);
+		}
+	}
+}
+
+void FTileGenWorker::TryPlaceTerminal(int32 PlanIndex, int32 Portal)
+{
+	TArray<FTileGenData>& Palette = TilePalettes[*ETileScheme::Terminal];
+	ShuffleArray(Palette);
+
+	for (const FTileGenData& NewTile : Palette)
+	{
+		for (int32 NewIndex = 0; NewIndex < NewTile.Portals.Num(); NewIndex++)
+		{
+			const FTilePortal& PlanPortal = TilePlans[PlanIndex].Portals[Portal];
+			const FTilePortal& NewPortal = NewTile.Portals[NewIndex];
+
+			if (NewPortal.CanConnect(PlanPortal))
+			{
+				FTransform NewTransform = FTilePortal::ConnectionTransform(NewPortal, PlanPortal);
+
+				if (CanPlaceTile(NewTile, NewTransform))
+				{
+					// Placement check successful; create the tile plan now.
+					FTileGenPlan NewPlan = FTileGenPlan(NewTile, NewTransform);
+
+					// Make the plan tile into the parent of the new tile.
+					NewPlan.SetConnection(NewIndex, PlanIndex, true);
+
+					// Make the new tile (index = length) into a child of the plan tile.
+					TilePlans[PlanIndex].SetConnection(Portal, TilePlans.Num());
+
+					// Append the plan and exit.
+					TilePlans.Emplace(NewPlan);
+					return;
+				}
+			}
+		}
+	}
+}
+
 template <typename ElementType>
 void FTileGenWorker::ShuffleArray(TArray<ElementType>& Array)
 {
@@ -220,4 +273,15 @@ void FTileGenWorker::Exit()
 	{
 		OnExitCapture.ExecuteIfBound();
 	});
+}
+
+void FTileGenWorker::GetTilePlans(TArray<FTileGenPlan>& OutTilePlans) const
+{
+	Thread->WaitForCompletion();
+	OutTilePlans.Empty(TilePlans.Num());
+
+	for (const FTileGenPlan& TilePlan : TilePlans)
+	{
+		OutTilePlans.Emplace(TilePlan);
+	}
 }

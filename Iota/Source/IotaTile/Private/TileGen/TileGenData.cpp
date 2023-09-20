@@ -3,11 +3,6 @@
 #include "TileGen/TileGenData.h"
 #include "TileData/TileDataAsset.h"
 
-FTileGenData::FTileGenData()
-{
-	// Default constructor.
-}
-
 FTileGenData::FTileGenData(const UTileDataAsset* DataAsset)
 	: Level(DataAsset->Level.ToSoftObjectPath())
 	, Portals(DataAsset->Portals)

@@ -20,15 +20,10 @@ struct FPlanPortal : public FTilePortal
 	 * @param BasePortal Base portal data for the new planned portal.
 	 * @param Transform World transform to apply to the new portal.
 	 */
-	FPlanPortal(const FTilePortal& BasePortal, const FTransform& Transform = FTransform::Identity);
+	FPlanPortal(const FTilePortal& BasePortal, const FTransform& Transform);
 
-	/**
-	 * Duplicates the given planned portal and optionally transforms it.
-	 *
-	 * @param PlanPortal Planned portal to duplicate.
-	 * @param Transform Transform to apply to the new portal.
-	 */
-	FPlanPortal(const FPlanPortal& PlanPortal, const FTransform& Transform = FTransform::Identity);
+	/** Copies values from the given planned portal. */
+	FPlanPortal(const FPlanPortal& PlanPortal);
 };
 
 /** Represents a planned tile within the generated level plan. */
@@ -49,24 +44,16 @@ struct FTileGenPlan
 	/** Tile world rotation. */
 	FRotator Rotation;
 
-	/** Defines an empty tile plan. */
-	FTileGenPlan();
-
 	/**
 	 * Copies values from the given tile data struct to create a tile plan.
 	 *
 	 * @param DataStruct Base tile data struct from which to build the plan.
 	 * @param Transform World transform to apply to the base tile data.
 	 */
-	FTileGenPlan(const FTileGenData& DataStruct, const FTransform& Transform = FTransform::Identity);
+	FTileGenPlan(const FTileGenData& DataStruct, const FTransform& Transform);
 
-	/**
-	 * Duplicates the given tile plan and optionally transforms it.
-	 *
-	 * @param TilePlan Tile plan to duplicate.
-	 * @param Transform Transform to apply to the new tile plan.
-	 */
-	FTileGenPlan(const FTileGenPlan& TilePlan, const FTransform& Transform = FTransform::Identity);
+	/** Copies values from the given tile plan. */
+	FTileGenPlan(const FTileGenPlan& TilePlan);
 
 	/**
 	 * Sets the connection value at the given portal index to the provided tile index. If the new

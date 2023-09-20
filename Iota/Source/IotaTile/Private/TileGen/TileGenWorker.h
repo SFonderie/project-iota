@@ -54,6 +54,14 @@ public:
 	 */
 	virtual void Exit() override;
 
+	/**
+	 * Attempts to return the generated level plan in the provided array. If the thread has not
+	 * yet completed, this method will wait for it to do so.
+	 *
+	 * @param OutTilePlans Generated level plan.
+	 */
+	void GetTilePlans(TArray<FTileGenPlan>& OutTilePlans) const;
+
 private:
 
 	/**
@@ -82,6 +90,21 @@ private:
 	 * @return True if the tile would not collide with the level plan.
 	 */
 	bool CanPlaceTile(const FTileGenData& NewTile, const FTransform& Transform) const;
+
+	/**
+	 * Attempts to attach terminal tiles to any vacant portals left on the given tile.
+	 *
+	 * @param PlanIndex Tile level plan index.
+	 */
+	void PlaceTerminals(int32 PlanIndex);
+
+	/**
+	 * Attempts to attach a terminal tile to the given plan portal.
+	 *
+	 * @param PlanIndex Tile level plan index.
+	 * @param Portal Portal index on the parent plan.
+	 */
+	void TryPlaceTerminal(int32 PlanIndex, int32 Portal);
 
 	/**
 	 * Shuffles the given array in place using the worker's random number stream.

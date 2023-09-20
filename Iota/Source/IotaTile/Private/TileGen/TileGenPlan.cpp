@@ -9,18 +9,11 @@ FPlanPortal::FPlanPortal(const FTilePortal& BasePortal, const FTransform& Transf
 	// Complete constructor.
 }
 
-FPlanPortal::FPlanPortal(const FPlanPortal& PlanPortal, const FTransform& Transform)
-	: FTilePortal(PlanPortal, Transform)
+FPlanPortal::FPlanPortal(const FPlanPortal& PlanPortal)
+	: FTilePortal(PlanPortal)
 	, ConnectionIndex(PlanPortal.ConnectionIndex)
 {
 	// Copy constructor.
-}
-
-FTileGenPlan::FTileGenPlan()
-	: Location(0, 0, 0)
-	, Rotation(0, 0, 0)
-{
-	// Default constructor.
 }
 
 FTileGenPlan::FTileGenPlan(const FTileGenData& DataStruct, const FTransform& Transform)
@@ -39,20 +32,14 @@ FTileGenPlan::FTileGenPlan(const FTileGenData& DataStruct, const FTransform& Tra
 	}
 }
 
-FTileGenPlan::FTileGenPlan(const FTileGenPlan& TilePlan, const FTransform& Transform)
+FTileGenPlan::FTileGenPlan(const FTileGenPlan& TilePlan)
 	: Level(TilePlan.Level)
-	, Location(Transform.TransformPosition(TilePlan.Location))
-	, Rotation(Transform.TransformRotation(TilePlan.Rotation.Quaternion()).Rotator())
+	, Portals(TilePlan.Portals)
+	, Bounds(TilePlan.Bounds)
+	, Location(TilePlan.Location)
+	, Rotation(TilePlan.Rotation)
 {
-	for (const FPlanPortal& Portal : TilePlan.Portals)
-	{
-		Portals.Emplace(Portal, Transform);
-	}
-
-	for (const FTileBound& Bound : TilePlan.Bounds)
-	{
-		Bounds.Emplace(Bound, Transform);
-	}
+	// Copy constructor.
 }
 
 void FTileGenPlan::SetConnection(int32 Index, int32 GraphIndex, bool bParent)
