@@ -41,7 +41,7 @@ void ATileDoorActor::NotifyActorEndOverlap(AActor* OtherActor)
 
 bool ATileDoorActor::CanActorTriggerDoor(AActor* Actor) const
 {
-	return Actor->IsA<APawn>();
+	return IsValid(Actor) && Actor->IsA<APawn>();
 }
 
 bool ATileDoorActor::IsDoorOpen() const

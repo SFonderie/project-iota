@@ -25,7 +25,7 @@ public:
 	 * type will be considered for the objective tile palette.
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "Objective"))
-	FGameplayTag MainObjective = FGameplayTag::RequestGameplayTag("Objective.Explore");
+	FGameplayTag MainObjective = FGameplayTag::RequestGameplayTag(TEXT("Objective.Explore"));
 
 	/**
 	 * Secondary objective types for the generated level. Tiles marked with these objectives will
@@ -36,7 +36,7 @@ public:
 
 	/** Global origin point for the generated level. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector Position;
+	FVector Location;
 
 	/** Global rotation applied to the generated level. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

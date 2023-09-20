@@ -47,7 +47,7 @@ enum class ETileScheme : uint8
 	Exit,
 
 	/**
-	 * Internal enum value used to create static arrays.
+	 * Internal enum value used to define range.
 	 */
 	Count UMETA(Hidden),
 };
@@ -64,4 +64,10 @@ constexpr uint8 IOTATILE_API operator*(ETileScheme Scheme)
 constexpr int32 IOTATILE_API operator<<(int32 Integer, ETileScheme Scheme)
 {
 	return Integer << uint8(Scheme);
+}
+
+/** @return True if the given tile scheme is an objective. */
+constexpr bool IOTATILE_API IsObjective(ETileScheme Scheme)
+{
+	return Scheme == ETileScheme::Objective;
 }

@@ -6,6 +6,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenParams)
 
 FTileGenParams::FTileGenParams()
+	: Location(0, 0, 0)
+	, Rotation(0, 0, 0)
 {
 	// Default constructor.
 }
@@ -14,9 +16,9 @@ FTileGenParams::FTileGenParams(const FTileGenParams& Params)
 	: Tileset(Params.Tileset)
 	, MainObjective(Params.MainObjective)
 	, SideObjectives(Params.SideObjectives)
-	, ObjectiveCount(Params.ObjectiveCount)
-	, Position(Params.Position)
+	, Location(Params.Location)
 	, Rotation(Params.Rotation)
+	, ObjectiveCount(Params.ObjectiveCount)
 	, Length(Params.Length)
 	, Branch(Params.Branch)
 	, Seed(Params.Seed)
