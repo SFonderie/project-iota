@@ -9,7 +9,7 @@
 struct FTileBound;
 class UBoxComponent;
 
-/** Represents an oriented tile bounding box in the world. */
+/** Represents a tile collision bound in the world. */
 UCLASS()
 class IOTATILE_API ATileBoundActor : public AActor
 {
@@ -20,9 +20,9 @@ public:
 	ATileBoundActor();
 
 	/**
-	 * Converts the actor box component into a tile bound data structure.
+	 * Converts the actor box component into a tile bound structure.
 	 *
-	 * @return The actor bounding box converted into a data-only form.
+	 * @return The actor bounding box converted into tile data.
 	 */
 	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TileBound")
 	FTileBound GetTileBound() const;

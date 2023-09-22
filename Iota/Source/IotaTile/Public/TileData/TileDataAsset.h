@@ -18,7 +18,7 @@ class IOTATILE_API UTileDataAsset : public UPrimaryDataAsset
 
 public:
 
-	/** Pointer to the actual tile level instance. */
+	/** Pointer to the actual tile level asset. */
 	UPROPERTY(Category = "TileLevel", EditAnywhere)
 	TSoftObjectPtr<UWorld> Level;
 
@@ -28,7 +28,7 @@ public:
 
 	/** Tileset to which the tile belongs. */
 	UPROPERTY(AssetRegistrySearchable, Category = "Categories", EditAnywhere, meta = (Categories = "Tileset"))
-	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
+	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag("Tileset.Whitebox");
 
 	/** Objectives to which the tile belongs. If empty, the tile will appear in all objectives. */
 	UPROPERTY(Category = "Categories", EditAnywhere, meta = (Categories = "Objective"))

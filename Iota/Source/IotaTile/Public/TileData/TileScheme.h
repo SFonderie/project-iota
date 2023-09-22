@@ -11,7 +11,7 @@ UENUM(BlueprintType, meta = (Bitflags))
 enum class ETileScheme : uint8
 {
 	/**
-	 * Indicates that a tile should be used to determine a level spawn point.
+	 * Indicates that a tile should be used to determine a map spawn point.
 	 * Start tiles should have at least one portal.
 	 */
 	Start,
@@ -23,7 +23,7 @@ enum class ETileScheme : uint8
 	Connector,
 
 	/**
-	 * Indicates that a tile should be used to branch the level or as an arena.
+	 * Indicates that a tile should be used to branch the map or as an arena.
 	 * Intermediate tiles should have at least three portals.
 	 */
 	Intermediate,
@@ -41,7 +41,7 @@ enum class ETileScheme : uint8
 	Terminal,
 
 	/**
-	 * Indicates that a tile should be used to determine a level end point.
+	 * Indicates that a tile should be used to determine a map end point.
 	 * Exit tiles should have at least one portal.
 	 */
 	Exit,

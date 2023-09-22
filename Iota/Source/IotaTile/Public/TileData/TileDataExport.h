@@ -31,7 +31,7 @@ public:
 
 	/** Tileset to which the tile belongs. */
 	UPROPERTY(Category = "ExportData", EditAnywhere, meta = (Categories = "Tileset"))
-	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag(TEXT("Tileset.Whitebox"));
+	FGameplayTag Tileset = FGameplayTag::RequestGameplayTag("Tileset.Whitebox");
 
 	/** Objectives to which the tile belongs. If empty, the tile will appear in all objectives. */
 	UPROPERTY(Category = "ExportData", EditAnywhere, meta = (Categories = "Objective"))
