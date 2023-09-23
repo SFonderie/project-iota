@@ -24,7 +24,7 @@ public:
 	 *
 	 * @return The actor bounding box converted into tile data.
 	 */
-	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TileBound")
+	UFUNCTION(BlueprintPure, Category = "Tile|TileBound")
 	FTileBound GetTileBound() const;
 
 private:

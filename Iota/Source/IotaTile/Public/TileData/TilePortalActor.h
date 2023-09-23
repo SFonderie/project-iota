@@ -26,7 +26,7 @@ public:
 	 *
 	 * @return The actor transform converted into tile data.
 	 */
-	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TilePortal")
+	UFUNCTION(BlueprintPure, Category = "Tile|TilePortal")
 	FTilePortal GetTilePortal() const;
 
 private:
