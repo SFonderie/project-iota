@@ -36,4 +36,11 @@ public:
 	 * @param InRotation Tile level rotation in world space.
 	 */
 	FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLocation, const FRotator& InRotation);
+
+	/**
+	 * Duplicates the provided tile plan or tile generation plan.
+	 *
+	 * @param TilePlan Tile plan to duplicate.
+	 */
+	FTilePlan(const FTilePlan& TilePlan);
 };

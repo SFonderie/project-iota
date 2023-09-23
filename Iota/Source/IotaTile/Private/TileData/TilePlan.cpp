@@ -18,3 +18,11 @@ FTilePlan::FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLoc
 {
 	// Complete constructor.
 }
+
+FTilePlan::FTilePlan(const FTilePlan& TilePlan)
+	: Level(TilePlan.Level)
+	, Location(TilePlan.Location)
+	, Rotation(TilePlan.Rotation)
+{
+	// Copy constructor.
+}
