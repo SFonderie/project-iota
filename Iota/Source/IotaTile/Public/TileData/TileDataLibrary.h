@@ -12,7 +12,7 @@ struct FTilePortal;
 
 /** Provides blueprint functions for tile data types. */
 UCLASS()
-class UTileDataLibrary : public UBlueprintFunctionLibrary
+class IOTATILE_API UTileDataLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -33,10 +33,10 @@ public:
 	 *
 	 * @param TileBound Tile bound to transform.
 	 * @param Transform Transform to apply to the tile bound.
-	 * @return Transformed tile bound.
+	 * @param NewBound Transformed tile bound.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Tile|TileBound")
-	static FTileBound TransformTileBound(const FTileBound& TileBound, const FTransform& Transform);
+	static void TransformTileBound(const FTileBound& TileBound, const FTransform& Transform, FTileBound& NewBound);
 
 	/**
 	 * Determines if the given tiles are colliding.
@@ -53,10 +53,10 @@ public:
 	 *
 	 * @param TileData Tile to transform.
 	 * @param Transform Transform to apply to the tile.
-	 * @return Transformed tile.
+	 * @param NewTile Transformed tile.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Tile")
-	static FTileData TransformTile(const FTileData& TileData, const FTransform& Transform);
+	static void TransformTile(const FTileData& TileData, const FTransform& Transform, FTileData& NewTile);
 
 	/**
 	 * Calculates the transform needed to position a new tile within a tile map such that it
@@ -74,8 +74,8 @@ public:
 	 *
 	 * @param TilePortal Tile portal to transform.
 	 * @param Transform Transform to apply to the tile portal.
-	 * @return Transformed tile portal.
+	 * @param NewPortal Transformed tile portal.
 	 */
 	UFUNCTION(BlueprintPure, Category = "Tile|TilePortal")
-	static FTilePortal TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform);
+	static void TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform, FTilePortal& NewPortal);
 };

@@ -113,6 +113,8 @@ void FTileGenWorker::Stop()
 
 void FTileGenWorker::Exit()
 {
+	bCanAccess = true;
+
 	// Move back to the game thread by invoking the exit delegate asynchronously. The lambda uses
 	// a value capture to access the delegate because the worker might get destroyed.
 	AsyncTask(ENamedThreads::GameThread, [OnExitCapture = OnExit]()
@@ -314,10 +316,4 @@ void FTileGenWorker::ShuffleArray(TArray<ElementType>& Array)
 	{
 		Array.Swap(i, RandomStream.RandRange(i + 1, Array.Num() - 1));
 	}
-}
-
-void FTileGenWorker::GetRawTileMap(TArray<FTileGraphPlan>& OutTileMap) const
-{
-	Thread->WaitForCompletion();
-	OutTileMap = TileMap;
 }

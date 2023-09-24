@@ -1,6 +1,6 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "TileDataLibrary.h"
+#include "TileData/TileDataLibrary.h"
 #include "TileData/TileBound.h"
 #include "TileData/TileData.h"
 #include "TileData/TilePortal.h"
@@ -12,9 +12,9 @@ bool UTileDataLibrary::TileBoundCollision(const FTileBound& A, const FTileBound&
 	return FTileBound::CheckCollision(A, B);
 }
 
-FTileBound UTileDataLibrary::TransformTileBound(const FTileBound& TileBound, const FTransform& Transform)
+void UTileDataLibrary::TransformTileBound(const FTileBound& TileBound, const FTransform& Transform, FTileBound& NewBound)
 {
-	return FTileBound(TileBound, Transform);
+	NewBound = FTileBound(TileBound, Transform);
 }
 
 bool UTileDataLibrary::TileCollision(const FTileData& A, const FTileData& B)
@@ -33,9 +33,9 @@ bool UTileDataLibrary::TileCollision(const FTileData& A, const FTileData& B)
 	return false;
 }
 
-FTileData UTileDataLibrary::TransformTile(const FTileData& TileData, const FTransform& Transform)
+void UTileDataLibrary::TransformTile(const FTileData& TileData, const FTransform& Transform, FTileData& NewTile)
 {
-	return FTileData(TileData, Transform);
+	NewTile = FTileData(TileData, Transform);
 }
 
 FTransform UTileDataLibrary::ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
@@ -43,7 +43,7 @@ FTransform UTileDataLibrary::ConnectionTransform(const FTilePortal& TilePortal, 
 	return FTilePortal::ConnectionTransform(TilePortal, WorldPortal);
 }
 
-FTilePortal UTileDataLibrary::TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform)
+void UTileDataLibrary::TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform, FTilePortal& NewPortal)
 {
-	return FTilePortal(TilePortal, Transform);
+	NewPortal = FTilePortal(TilePortal, Transform);
 }

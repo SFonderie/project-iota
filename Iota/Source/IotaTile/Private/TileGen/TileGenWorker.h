@@ -17,6 +17,10 @@ struct FTileGraphPlan;
 /** Asynchronous worker that actually handles tile map generation. */
 class FTileGenWorker : public FRunnable, public FSingleThreadRunnable
 {
+	friend class FTileGenAction;
+
+public:
+
 	/**
 	 * Creates a new tile map generation worker using the given parameters and tile list, and
 	 * starts a thread to run it. When the thread exits, it will invoke the provided delegate.
@@ -32,6 +36,8 @@ class FTileGenWorker : public FRunnable, public FSingleThreadRunnable
 	 * method is invoked, it will stop the thread and wait for it to return.
 	 */
 	virtual ~FTileGenWorker();
+
+private:
 
 	/** Handles pre-loop worker initialization. */
 	virtual bool Init() override;
@@ -50,11 +56,6 @@ class FTileGenWorker : public FRunnable, public FSingleThreadRunnable
 
 	/** Returns the worker as a runnable for fake threads. */
 	virtual FSingleThreadRunnable* GetSingleThreadInterface() override;
-
-	/** Returns the raw tile map as an array of graph plans. */
-	void GetRawTileMap(TArray<FTileGraphPlan>& OutTileMap) const;
-
-private:
 
 	/**
 	 * Attempts to add a new tile of the given scheme to the tile map.
@@ -106,8 +107,6 @@ private:
 	template <class ElementType>
 	void ShuffleArray(TArray<ElementType>& Array);
 
-private:
-
 	/** Actual worker thread. */
 	FRunnableThread* Thread = nullptr;
 
@@ -131,6 +130,9 @@ private:
 
 	/** Allows the thread to stop. */
 	FThreadSafeBool bStopThread;
+
+	/** Marks the thread as safe. */
+	FThreadSafeBool bCanAccess;
 
 	/** Tracks worker progress. */
 	FThreadSafeCounter Progress;
