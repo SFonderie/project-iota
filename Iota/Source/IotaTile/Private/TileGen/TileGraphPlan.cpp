@@ -9,9 +9,15 @@ FTileGraphPortal::FTileGraphPortal(const FTilePortal& BasePortal, const FTransfo
 	// Complete constructor.
 }
 
-FTileGraphPlan::FTileGraphPlan(const FTileData& TemplateData, const FTransform& Transform)
+FTileGraphPlan::FTileGraphPlan(const FTileData& TemplateData, const FTransform& Transform, bool bGraphRoot)
 	: FTilePlan(TemplateData.Level, Transform.GetLocation(), Transform.Rotator())
 {
+	if (bGraphRoot)
+	{
+		Portals.Emplace(FTilePortal(), Transform);
+		Portals.GetData()->ConnectionIndex = -2;
+	}
+
 	for (const FTilePortal& Portal : TemplateData.Portals)
 	{
 		Portals.Emplace(Portal, Transform);
@@ -43,5 +49,5 @@ int32 FTileGraphPlan::GetConnection(int32 Index) const
 bool FTileGraphPlan::IsOpenPortal(int32 Index) const
 {
 	check(0 <= Index && Index < Portals.Num());
-	return Portals[Index].ConnectionIndex < 0;
+	return Portals[Index].ConnectionIndex == -1;
 }

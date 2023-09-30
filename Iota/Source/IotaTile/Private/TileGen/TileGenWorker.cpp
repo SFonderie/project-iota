@@ -154,7 +154,7 @@ bool FTileGenWorker::TryPlaceTile(const FTileData& NewTile)
 {
 	if (TileMap.IsEmpty())
 	{
-		TileMap.Emplace(NewTile, FTransform(Params.Rotation, Params.Location));
+		TileMap.Emplace(NewTile, FTransform(Params.Rotation, Params.Location), true);
 		return true;
 	}
 

@@ -38,8 +38,9 @@ struct FTileGraphPlan : public FTilePlan
 	 *
 	 * @param TemplateData Tile template data to duplicate.
 	 * @param Transform World transform to apply to the tile template.
+	 * @param bGraphRoot True if the new plan is meant to be a graph root.
 	 */
-	FTileGraphPlan(const FTileData& TemplateData, const FTransform& Transform);
+	FTileGraphPlan(const FTileData& TemplateData, const FTransform& Transform, bool bGraphRoot = false);
 
 	/**
 	 * Sets the connection value at the given portal index to the provided tile map index. If the

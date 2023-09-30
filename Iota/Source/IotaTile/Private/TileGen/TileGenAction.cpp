@@ -2,10 +2,10 @@
 
 #include "TileGen/TileGenAction.h"
 #include "TileGen/TileGenWorker.h"
-#include "TileData/TileDataAsset.h"
 #include "TileGen/TileGraphPlan.h"
+#include "TileData/TileDataAsset.h"
+#include "TileData/TilePlan.h"
 #include "Engine/AssetManager.h"
-#include "Async/Async.h"
 
 FTileGenAction::FTileGenAction(const FTileGenParams& InParams, const FSimpleDelegate& InDelegate)
 	: Params(InParams)
@@ -88,7 +88,12 @@ bool FTileGenAction::CanAccess() const
 	return AsyncWorker.IsValid() && AsyncWorker->bCanAccess;
 }
 
-bool FTileGenAction::GetTileMap(TArray<FTileGraphPlan>& OutTileMap) const
+bool FTileGenAction::IsMapValid() const
 {
-	return false;
+	return CanAccess() && Params.Length <= AsyncWorker->TileMap.Num();
+}
+
+const TArray<FTileGraphPlan>* FTileGenAction::GetTileMap() const
+{
+	return CanAccess() ? &AsyncWorker->TileMap : nullptr;
 }
