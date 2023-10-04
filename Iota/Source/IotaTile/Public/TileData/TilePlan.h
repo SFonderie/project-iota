@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "TilePlan.generated.h"
 
+class UPackageMap;
+
 /** Data needed to stream in a tile level. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTilePlan
@@ -43,4 +45,23 @@ public:
 	 * @param TilePlan Tile plan to duplicate.
 	 */
 	FTilePlan(const FTilePlan& TilePlan);
+
+	/**
+	 * Compresses the tile plan to minimize its network size.
+	 *
+	 * @param Archive Archive object from which to read and write.
+	 * @param PackageMap Package map for resolving UObject pointers.
+	 * @param bOutSuccess True if no errors were encountered.
+	 * @return True if the tile plan was fully serialized.
+	 */
+	bool NetSerialize(FArchive& Archive, UPackageMap* PackageMap, bool& bOutSuccess);
+};
+
+template<>
+struct TStructOpsTypeTraits<FTilePlan> : public TStructOpsTypeTraitsBase2<FTilePlan>
+{
+	enum
+	{
+		WithNetSerializer = true
+	};
 };

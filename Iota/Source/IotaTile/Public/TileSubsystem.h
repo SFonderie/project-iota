@@ -44,6 +44,17 @@ public:
 	bool GenerateNewMap(const FTileGenParams& Parameters, const FGeneratorDelegate& OnComplete);
 
 	/**
+	 * Attempts to access the tile map last generated via the subsystem. If there is no active
+	 * generator, or the generator has yet to complete, then this method will return false.
+	 *
+	 * @param OutTileMap Current generated tile map stored on the subsystem.
+	 * @param OutMapIndex Server map index for the generated tile map.
+	 * @return True if there was a tile map to export.
+	 */
+	UFUNCTION(BlueprintPure = false, Category = "Tile|Subsystem")
+	bool GetTileMap(TArray<FTilePlan>& OutTileMap, uint8& OutMapIndex) const;
+
+	/**
 	 * Dynamically streams a tile map into the subsystem world, using array indices to assign each
 	 * tile a unique identifier. Calling this method while there is another tile map active in the
 	 * world will cause the active map to be discarded in favor of the new one.
@@ -70,10 +81,10 @@ private:
 	/** Stores the delegate invoked on generator completion. */
 	FGeneratorDelegate OnGeneratorComplete;
 
+	/** Tracks the number of generated tile maps produced by the subsystem. */
+	int32 MapCount = 0;
+
 	/** Tracks all tile level streams active in the current world. */
 	UPROPERTY()
 	TArray<TObjectPtr<UTilePlanStream>> ActiveStreams;
-
-	/** Tracks how many tile maps have been streamed into the world. */
-	int32 MapCount = 0;
 };

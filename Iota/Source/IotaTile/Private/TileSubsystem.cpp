@@ -3,6 +3,7 @@
 #include "TileSubsystem.h"
 #include "TileData/TilePlan.h"
 #include "TileGen/TileGenAction.h"
+#include "TileGen/TileGraphPlan.h"
 #include "TileMap/TilePlanStream.h"
 #include "Engine/World.h"
 
@@ -31,17 +32,42 @@ bool UTileSubsystem::GenerateNewMap(const FTileGenParams& Parameters, const FGen
 
 void UTileSubsystem::NotifyGeneratorComplete()
 {
-	if (GeneratorAction->IsMapValid())
+	if (CanGenerate() && GeneratorAction.IsValid())
 	{
-		if (OnGeneratorComplete.IsBound())
+		if (GeneratorAction->IsMapValid())
 		{
-			OnGeneratorComplete.Execute();
+			// SOMETHING SOMETHING TILE GRAPH HERE
+
+			MapCount++;
+			OnGeneratorComplete.ExecuteIfBound();
+		}
+		else
+		{
+			GeneratorAction->Regenerate();
 		}
 	}
-	else
+}
+
+bool UTileSubsystem::GetTileMap(TArray<FTilePlan>& OutTileMap, uint8& OutMapIndex) const
+{
+	OutTileMap.Empty();
+	OutMapIndex = 0;
+
+	if (GeneratorAction.IsValid() && GeneratorAction->IsMapValid())
 	{
-		GeneratorAction->Regenerate();
+		if (const TArray<FTileGraphPlan>* TileMap = GeneratorAction->GetTileMap())
+		{
+			for (const FTileGraphPlan& GraphPlan : *TileMap)
+			{
+				OutTileMap.Emplace(GraphPlan);
+			}
+		}
+
+		OutMapIndex = uint8(MapCount);
+		return true;
 	}
+
+	return false;
 }
 
 void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, uint8 MapIndex)
@@ -68,7 +94,4 @@ void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, uint8
 			ActiveStreams.Emplace(NewStream);
 		}
 	}
-
-	// Increment the tracker so that the next map switch can happen safely.
-	MapCount++;
 }

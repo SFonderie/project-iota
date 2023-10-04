@@ -26,3 +26,16 @@ FTilePlan::FTilePlan(const FTilePlan& TilePlan)
 {
 	// Copy constructor.
 }
+
+bool FTilePlan::NetSerialize(FArchive& Archive, UPackageMap* PackageMap, bool& bOutSuccess)
+{
+	FString AssetPath = Level.ToString();
+	Archive << AssetPath;
+	Level = AssetPath;
+
+	Location.NetSerialize(Archive, PackageMap, bOutSuccess);
+	Rotation.NetSerialize(Archive, PackageMap, bOutSuccess);
+
+	bOutSuccess = true;
+	return true;
+}
