@@ -39,6 +39,9 @@ public:
 
 private:
 
+	/** Creates and starts a worker thread instance. */
+	void Start();
+
 	/** Handles pre-loop worker initialization. */
 	virtual bool Init() override;
 

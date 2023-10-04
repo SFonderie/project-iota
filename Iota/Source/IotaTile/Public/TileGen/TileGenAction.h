@@ -30,6 +30,16 @@ public:
 	~FTileGenAction();
 
 	/**
+	 * Restarts the asynchronous worker and generates another tile map. All parameters will remain
+	 * constant in the new map except for the seed, which will use the last number mutated for the
+	 * previous map as its new value. When the new map is complete, the completion delegate will
+	 * fire again.
+	 *
+	 * Note that this method will not execute if the previous generation cycle is incomplete.
+	 */
+	void Regenerate();
+
+	/**
 	 * Checks to see if the asynchronous worker is finished generating the tile map. This method
 	 * will always return true if the action's completion delegate has fired.
 	 *

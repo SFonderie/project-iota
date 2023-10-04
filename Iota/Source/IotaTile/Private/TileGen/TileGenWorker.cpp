@@ -40,7 +40,7 @@ FTileGenWorker::FTileGenWorker(const FTileGenParams& InParams, const TArray<UTil
 		}
 	}
 
-	Thread = FRunnableThread::Create(this, TEXT("IotaTileGenThread"));
+	Start();
 }
 
 FTileGenWorker::~FTileGenWorker()
@@ -52,9 +52,25 @@ FTileGenWorker::~FTileGenWorker()
 	}
 }
 
+void FTileGenWorker::Start()
+{
+	if (Thread)
+	{
+		Thread->Kill();
+		delete Thread;
+	}
+
+	bStopThread = false;
+	bCanAccess = false;
+
+	Thread = FRunnableThread::Create(this, TEXT("IotaTileGenThread"));
+}
+
 bool FTileGenWorker::Init()
 {
 	Params.GetSchemeSequence(Sequence);
+
+	TileMap.Empty(Params.Length);
 	Progress.Reset();
 
 	return true;

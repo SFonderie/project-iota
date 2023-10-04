@@ -83,6 +83,14 @@ void FTileGenAction::NotifyAssetsLoaded()
 	DataAssetHandle.Reset();
 }
 
+void FTileGenAction::Regenerate()
+{
+	if (CanAccess())
+	{
+		AsyncWorker->Start();
+	}
+}
+
 bool FTileGenAction::CanAccess() const
 {
 	return AsyncWorker.IsValid() && AsyncWorker->bCanAccess;
