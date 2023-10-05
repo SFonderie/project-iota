@@ -14,7 +14,7 @@ bool UTileSubsystem::CanGenerate() const
 	return GetWorld()->GetNetMode() < NM_Client;
 }
 
-bool UTileSubsystem::GenerateNewMap(const FTileGenParams& Parameters, const FGeneratorDelegate& OnComplete)
+void UTileSubsystem::MakeNewTileMap(const FTileGenParams& Parameters, const FGeneratorDelegate& OnComplete)
 {
 	if (CanGenerate())
 	{
@@ -24,22 +24,42 @@ bool UTileSubsystem::GenerateNewMap(const FTileGenParams& Parameters, const FGen
 		// automatically destroys the previous action instance and dumps its resources.
 		GeneratorAction = MakeShared<FTileGenAction>(Parameters, Callback);
 		OnGeneratorComplete = OnComplete;
-		return true;
 	}
-
-	return false;
 }
 
 void UTileSubsystem::NotifyGeneratorComplete()
 {
-	if (CanGenerate() && GeneratorAction.IsValid())
+	if (GeneratorAction.IsValid())
 	{
 		if (GeneratorAction->IsMapValid())
 		{
-			// SOMETHING SOMETHING TILE GRAPH HERE
-
+			MapGraph.Empty();
 			MapCount++;
-			OnGeneratorComplete.ExecuteIfBound();
+
+			for (const FTileGraphPlan& GraphPlan : *GeneratorAction->GetTileMap())
+			{
+				int32 NewNode = MapGraph.MakeNode(GraphPlan);
+
+				if (0 <= GraphPlan.GetConnection())
+				{
+					MapGraph.MakeEdge(NewNode, GraphPlan.GetConnection());
+
+					// SPAWN STANDARD DOOR
+				}
+
+				for (int32 Index = 1; Index < GraphPlan.Portals.Num(); Index++)
+				{
+					if (GraphPlan.IsOpenPortal(Index))
+					{
+						// SPAWN SEALED DOOR
+					}
+				}
+			}
+
+			if (OnGeneratorComplete.IsBound())
+			{
+				OnGeneratorComplete.Execute();
+			}
 		}
 		else
 		{
@@ -48,30 +68,27 @@ void UTileSubsystem::NotifyGeneratorComplete()
 	}
 }
 
-bool UTileSubsystem::GetTileMap(TArray<FTilePlan>& OutTileMap, uint8& OutMapIndex) const
+void UTileSubsystem::GetNewTileMap(TArray<FTilePlan>& OutTileMap, int32& OutMapIndex) const
 {
 	OutTileMap.Empty();
 	OutMapIndex = 0;
 
 	if (GeneratorAction.IsValid() && GeneratorAction->IsMapValid())
 	{
-		if (const TArray<FTileGraphPlan>* TileMap = GeneratorAction->GetTileMap())
-		{
-			for (const FTileGraphPlan& GraphPlan : *TileMap)
-			{
-				OutTileMap.Emplace(GraphPlan);
-			}
-		}
-
-		OutMapIndex = uint8(MapCount);
-		return true;
+		MapGraph.GetTilePlans(OutTileMap);
+		OutMapIndex = MapCount;
 	}
-
-	return false;
 }
 
-void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, uint8 MapIndex)
+void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32 MapIndex)
 {
+	// Ensure that the map index exceeds the active index. Doing so guarantees that each new map
+	// index is always unique and thus eliminates the risk of name overlaps.
+	if (MapIndex <= ActiveIndex)
+	{
+		return;
+	}
+
 	// Mark the active tile map as requesting an unload and removal. Doing so is asynchronous, so
 	// the active map will remain in-world when the new map begins its load.
 	for (UTilePlanStream* Stream : ActiveStreams)
@@ -81,6 +98,7 @@ void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, uint8
 
 	// Empty and reserve the active array.
 	ActiveStreams.Empty(NewTileMap.Num());
+	ActiveIndex = MapIndex;
 
 	for (int32 PlanIndex = 0; PlanIndex < NewTileMap.Num(); PlanIndex++)
 	{

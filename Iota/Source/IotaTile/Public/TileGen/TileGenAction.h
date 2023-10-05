@@ -64,15 +64,17 @@ public:
 	 */
 	const TArray<FTileGraphPlan>* GetTileMap() const;
 
+public:
+
+	/** Action generation parameters. */
+	const FTileGenParams Params;
+
 private:
 
 	/** Invoked by the engine when it has loaded the tile data assets that the action requested. */
 	void NotifyAssetsLoaded();
 
 private:
-
-	/** Action generation parameters. */
-	FTileGenParams Params;
 
 	/** Delegate invoked when the generation action completes. */
 	FSimpleDelegate OnComplete;
