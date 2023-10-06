@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TileMap/TileAssetActor.h"
+#include "IotaCore/AssetActor.h"
 #include "TileDoorBase.generated.h"
 
 class USceneComponent;
 
 /** Base class for door actors spawned during tile map generation. */
 UCLASS(Abstract)
-class IOTATILE_API ATileDoorBase : public ATileAssetActor
+class IOTATILE_API ATileDoorBase : public AAssetActor
 {
 	GENERATED_BODY()
 

@@ -116,10 +116,14 @@ public:
 		}
 	};
 
-	/** Constructs an empty graph. */
 	TGraphBase()
 	{
 		// Default constructor.
+	}
+
+	virtual ~TGraphBase()
+	{
+		// Default destructor.
 	}
 
 	/**
@@ -166,6 +170,16 @@ public:
 	}
 
 	/**
+	 * Returns true if the graph is empty and contains no nodes.
+	 *
+	 * @return True if the graph is empty.
+	 */
+	bool IsEmpty() const
+	{
+		return Nodes.IsEmpty();
+	}
+
+	/**
 	 * Returns the number of nodes currently stored within the graph.
 	 *
 	 * @return Number of nodes in the graph.
@@ -198,7 +212,7 @@ public:
 	}
 
 	/** Empties the graph and discards all graph data. */
-	void Empty()
+	virtual void Empty()
 	{
 		Nodes.Empty();
 	}

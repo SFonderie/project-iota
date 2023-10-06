@@ -11,6 +11,25 @@ FTileDoor::~FTileDoor()
 	}
 }
 
+void FTileMapGraph::Empty()
+{
+	// Smart pointers ensure that emptying the map graph will destroy all true doors via the
+	// destructor method above.
+	TGraphBase::Empty();
+
+	// Door seals must be manually destroyed since they are not stored in the graph.
+	for (ATileDoorBase* DoorActor : DoorSeals)
+	{
+		if (IsValid(DoorActor))
+		{
+			DoorActor->Destroy();
+		}
+	}
+
+	// Drop the references to the old seals.
+	DoorSeals.Empty();
+}
+
 void FTileMapGraph::GetTilePlans(TArray<FTilePlan>& OutTilePlans) const
 {
 	OutTilePlans.Empty(GetSize());

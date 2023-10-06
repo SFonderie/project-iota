@@ -4,7 +4,9 @@
 #include "TileData/TilePlan.h"
 #include "TileGen/TileGenAction.h"
 #include "TileGen/TileGraphPlan.h"
+#include "TileMap/TileDoorBase.h"
 #include "TileMap/TilePlanStream.h"
+#include "IotaCore/ActorTable.h"
 #include "Engine/World.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileSubsystem)
@@ -36,6 +38,15 @@ void UTileSubsystem::NotifyGeneratorComplete()
 			MapGraph.Empty();
 			MapCount++;
 
+			TActorTable<FIntPoint, ATileDoorBase> DoorTable;
+
+			// Collect all door subtypes that belong to the tileset and store them in the table.
+			// Use door size as the key for each entry.
+			DoorTable.CollectWithCategory(GeneratorAction->Params.Tileset, [](ATileDoorBase* AssetObject)
+			{
+				return AssetObject->DoorSize;
+			});
+
 			for (const FTileGraphPlan& GraphPlan : *GeneratorAction->GetTileMap())
 			{
 				int32 NewNode = MapGraph.MakeNode(GraphPlan);
@@ -44,14 +55,14 @@ void UTileSubsystem::NotifyGeneratorComplete()
 				{
 					MapGraph.MakeEdge(NewNode, GraphPlan.GetConnection());
 
-					// SPAWN STANDARD DOOR
+					// CREATE STANDARD DOOR SPAWN REQUEST
 				}
 
 				for (int32 Index = 1; Index < GraphPlan.Portals.Num(); Index++)
 				{
 					if (GraphPlan.IsOpenPortal(Index))
 					{
-						// SPAWN SEALED DOOR
+						// CREATE SEALED DOOR SPAWN REQUEST
 					}
 				}
 			}
