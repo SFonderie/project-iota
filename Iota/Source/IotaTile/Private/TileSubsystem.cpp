@@ -5,6 +5,7 @@
 #include "TileGen/TileGenAction.h"
 #include "TileGen/TileGraphPlan.h"
 #include "TileMap/TileDoorBase.h"
+#include "TileMap/TileMapGraph.h"
 #include "TileMap/TilePlanStream.h"
 #include "IotaCore/ActorTable.h"
 #include "Engine/World.h"
@@ -26,6 +27,10 @@ void UTileSubsystem::MakeNewTileMap(const FTileGenParams& Parameters, const FGen
 		// automatically destroys the previous action instance and dumps its resources.
 		GeneratorAction = MakeShared<FTileGenAction>(Parameters, Callback);
 		OnGeneratorComplete = OnComplete;
+
+		// Create a new tile map graph and pass in the subsystem world context. Doing so also 
+		// automatically destroys the previous map graph and destroys all actors stored on it.
+		MapGraph = MakeShared<FTileMapGraph>(GetWorld());
 	}
 }
 
@@ -33,45 +38,75 @@ void UTileSubsystem::NotifyGeneratorComplete()
 {
 	if (GeneratorAction.IsValid())
 	{
+		// If the generated tile map is valid and contains a complete core tile sequence then it
+		// can be loaded into the subsystem map graph.
 		if (GeneratorAction->IsMapValid())
 		{
-			MapGraph.Empty();
+			// Increment the map counter.
 			MapCount++;
 
-			TActorTable<FIntPoint, ATileDoorBase> DoorTable;
-
-			// Collect all door subtypes that belong to the tileset and store them in the table.
-			// Use door size as the key for each entry.
-			DoorTable.CollectWithCategory(GeneratorAction->Params.Tileset, [](ATileDoorBase* AssetObject)
+			// Collect all door subtypes that belong to the tileset and store them in a table.
+			// For each door added, use its door size as its key for the table.
+			TActorTable<FIntPoint, ATileDoorBase> DoorTable(GeneratorAction->Params.Tileset, [](ATileDoorBase* AssetObject)
 			{
 				return AssetObject->DoorSize;
 			});
 
+			// Populate the map graph. Each graph plan can be converted into a graph node using the
+			// base tile plan to fill the node data. One edge can also be added for each graph plan
+			// parent connection.
 			for (const FTileGraphPlan& GraphPlan : *GeneratorAction->GetTileMap())
 			{
-				int32 NewNode = MapGraph.MakeNode(GraphPlan);
+				int32 NewNode = MapGraph->MakeNode(GraphPlan);
 
 				if (0 <= GraphPlan.GetConnection())
 				{
-					MapGraph.MakeEdge(NewNode, GraphPlan.GetConnection());
+					FTileDoor& NewDoor = MapGraph->MakeEdge(NewNode, GraphPlan.GetConnection());
 
-					// CREATE STANDARD DOOR SPAWN REQUEST
+					// If the current graph plan index exceeds the parameter length, then the plan
+					// must represent a terminal tile.
+					NewDoor.bTerminal = GeneratorAction->Params.Length <= NewNode;
+
+					// Isolate the first portal on the plan for easy access.
+					const FTileGraphPortal& Portal = *GraphPlan.Portals.GetData();
+
+					// Calculate the door transform from the portal values.
+					FRotator Rotation = FRotationMatrix::MakeFromX(Portal.Direction).Rotator();
+					FTransform DoorTransform(Rotation, Portal.Location);
+
+					// Spawn a new door, using the table to select a size-appropriate door class
+					// Also pass in the calculated door transform and edge data address.
+					MapGraph->RequestDoor(DoorTable.GetRandomSubtype(Portal.PlaneSize), DoorTransform, &NewDoor);
 				}
 
+				// Vacant portals represent holes in level geometry, so they need to be filled.
 				for (int32 Index = 1; Index < GraphPlan.Portals.Num(); Index++)
 				{
 					if (GraphPlan.IsOpenPortal(Index))
 					{
-						// CREATE SEALED DOOR SPAWN REQUEST
+						// Isolate the current portal using the index value.
+						const FTileGraphPortal& Portal = GraphPlan.Portals[Index];
+
+						// Calculate the door transform from the portal values.
+						FRotator Rotation = FRotationMatrix::MakeFromX(Portal.Direction).Rotator();
+						FTransform DoorTransform(Rotation, Portal.Location);
+
+						// Spawn a new door, using the table to select a size-appropriate door class
+						// Also pass in the calculated door transform.
+						MapGraph->RequestDoor(DoorTable.GetRandomSubtype(Portal.PlaneSize), DoorTransform);
 					}
 				}
 			}
 
+			// Trigger the callback delegate once the map is stored.
 			if (OnGeneratorComplete.IsBound())
 			{
 				OnGeneratorComplete.Execute();
 			}
 		}
+
+		// If the generated tile map is not valid, regenerate it and wait for the next completion.
+		// Keep regenerating until a valid map is generated.
 		else
 		{
 			GeneratorAction->Regenerate();
@@ -79,19 +114,19 @@ void UTileSubsystem::NotifyGeneratorComplete()
 	}
 }
 
-void UTileSubsystem::GetNewTileMap(TArray<FTilePlan>& OutTileMap, int32& OutMapIndex) const
+void UTileSubsystem::GetGraphTileMap(TArray<FTilePlan>& OutTileMap, int32& OutMapIndex) const
 {
 	OutTileMap.Empty();
 	OutMapIndex = 0;
 
-	if (GeneratorAction.IsValid() && GeneratorAction->IsMapValid())
+	if (MapGraph.IsValid() && !MapGraph->IsEmpty())
 	{
-		MapGraph.GetTilePlans(OutTileMap);
+		MapGraph->GetPlans(OutTileMap);
 		OutMapIndex = MapCount;
 	}
 }
 
-void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32 MapIndex)
+void UTileSubsystem::SetLiveTileMap(const TArray<FTilePlan>& NewTileMap, int32 MapIndex)
 {
 	// Ensure that the map index exceeds the active index. Doing so guarantees that each new map
 	// index is always unique and thus eliminates the risk of name overlaps.
@@ -124,5 +159,12 @@ void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32
 		{
 			ActiveStreams.Emplace(NewStream);
 		}
+	}
+
+	// If the subsystem is running on a server and has a valid map graph stored within itself, then
+	// mark the map graph as live to spawn in additional actors (such as doors).
+	if (CanGenerate() && MapGraph.IsValid() && !MapGraph->IsEmpty())
+	{
+		MapGraph->SetLive();
 	}
 }

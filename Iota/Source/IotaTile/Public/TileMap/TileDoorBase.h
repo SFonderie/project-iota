@@ -8,7 +8,14 @@
 
 class USceneComponent;
 
-/** Base class for door actors spawned during tile map generation. */
+/**
+ * Base class for door actors spawned during tile map generation. Doors are selected for spawning
+ * based on their tileset category and size. Doors without a tileset category will be ignored for
+ * spawns.
+ *
+ * Non-abstract child types should always fill out the Asset ID section under the Class Defaults.
+ * Abstract child types can choose to ignore these values.
+ */
 UCLASS(Abstract)
 class IOTATILE_API ATileDoorBase : public AAssetActor
 {

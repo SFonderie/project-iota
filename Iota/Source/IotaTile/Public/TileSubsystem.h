@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "TileMap/TileMapGraph.h"
 #include "TileSubsystem.generated.h"
 
 class FTileGenAction;
+class FTileMapGraph;
 class UTilePlanStream;
 
 struct FTileGenParams;
@@ -53,7 +53,7 @@ public:
 	 * @param OutMapIndex Server map index used to ensure safe replication.
 	 */
 	UFUNCTION(BlueprintPure = false, Category = "Tile|Subsystem")
-	void GetNewTileMap(TArray<FTilePlan>& OutTileMap, int32& OutMapIndex) const;
+	void GetGraphTileMap(TArray<FTilePlan>& OutTileMap, int32& OutMapIndex) const;
 
 	/**
 	 * Dynamically streams a tile map into the subsystem world, using array indices to assign each
@@ -68,7 +68,7 @@ public:
 	 * @param MapIndex Server map index used to ensure safe replication.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Tile|Subsystem")
-	void SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32 MapIndex);
+	void SetLiveTileMap(const TArray<FTilePlan>& NewTileMap, int32 MapIndex);
 
 private:
 
@@ -84,7 +84,7 @@ private:
 	FGeneratorDelegate OnGeneratorComplete;
 
 	/** Stores the active tile map as a graph structure. */
-	FTileMapGraph MapGraph;
+	TSharedPtr<FTileMapGraph> MapGraph;
 
 	/** Tracks the number of generated tile maps produced by the subsystem. */
 	int32 MapCount = 0;
