@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class IotaTile : ModuleRules
+public class IotaGame : ModuleRules
 {
-	public IotaTile(ReadOnlyTargetRules Target) : base(Target)
+	public IotaGame(ReadOnlyTargetRules Target) : base(Target)
 	{
 		// Enable Include-What-You-Use in the module.
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -14,10 +14,13 @@ public class IotaTile : ModuleRules
 		PublicDependencyModuleNames.Add("CoreUObject");
 		PublicDependencyModuleNames.Add("Engine");
 
-		// SPECIFIC MODULES
+		// GAMEPLAY MODULES
+		PublicDependencyModuleNames.Add("GameplayAbilities");
 		PublicDependencyModuleNames.Add("GameplayTags");
+		PublicDependencyModuleNames.Add("GameplayTasks");
 
 		// IOTA MODULES
 		PublicDependencyModuleNames.Add("IotaCore");
+		PublicDependencyModuleNames.Add("IotaTile");
 	}
 }

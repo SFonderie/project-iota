@@ -46,7 +46,7 @@ bool ATileDoorBase::CanActorTriggerDoor(AActor* Actor) const
 
 bool ATileDoorBase::IsDoorOpen() const
 {
-	return !TriggerActors.IsEmpty() && !bIsLocked;
+	return !TriggerActors.IsEmpty() && !bIsLocked && !bIsSealed;
 }
 
 float ATileDoorBase::GetSlideRaw() const

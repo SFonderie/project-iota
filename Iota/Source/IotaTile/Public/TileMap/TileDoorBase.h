@@ -92,6 +92,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "DoorSettings", EditAnywhere)
 	bool bIsLocked = false;
 
+	/** Door seal state. While true, the door becomes locked shut. */
+	UPROPERTY(BlueprintReadWrite, Category = "DoorSettings", EditAnywhere)
+	bool bIsSealed = false;
+
 private:
 
 	/** Door base component used as the door's pivot during placement. */

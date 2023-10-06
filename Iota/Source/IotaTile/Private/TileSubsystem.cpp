@@ -89,6 +89,9 @@ void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32
 		return;
 	}
 
+	// Update the active index.
+	ActiveIndex = MapIndex;
+
 	// Mark the active tile map as requesting an unload and removal. Doing so is asynchronous, so
 	// the active map will remain in-world when the new map begins its load.
 	for (UTilePlanStream* Stream : ActiveStreams)
@@ -98,7 +101,6 @@ void UTileSubsystem::SetActiveTileMap(const TArray<FTilePlan>& NewTileMap, int32
 
 	// Empty and reserve the active array.
 	ActiveStreams.Empty(NewTileMap.Num());
-	ActiveIndex = MapIndex;
 
 	for (int32 PlanIndex = 0; PlanIndex < NewTileMap.Num(); PlanIndex++)
 	{

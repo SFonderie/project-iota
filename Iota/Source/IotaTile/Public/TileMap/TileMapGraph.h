@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TileData/TilePlan.h"
-#include "TileMap/TileGraphBase.h"
+#include "IotaCore/GraphBase.h"
 
 class ATileDoorBase;
 
@@ -22,7 +22,7 @@ struct IOTATILE_API FTileDoor
 };
 
 /** Represents tile maps as undirected graphs where tiles are nodes and doors are edges. */
-class IOTATILE_API FTileMapGraph : public TTileGraphBase<FTilePlan, FTileDoor>
+class IOTATILE_API FTileMapGraph : public TGraphBase<FTilePlan, FTileDoor>
 {
 
 public:

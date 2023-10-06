@@ -11,7 +11,7 @@
  * @param EdgeData Data type to store within each graph edge. Defaults to an integer weight value.
  */
 template <typename NodeData, typename EdgeData = int32>
-class TTileGraphBase
+class TGraphBase
 {
 
 public:
@@ -116,8 +116,8 @@ public:
 		}
 	};
 
-	/** Constructs an empty tile graph. */
-	TTileGraphBase()
+	/** Constructs an empty graph. */
+	TGraphBase()
 	{
 		// Default constructor.
 	}
