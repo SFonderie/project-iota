@@ -10,6 +10,8 @@ ATileDoorBase::ATileDoorBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	SetReplicates(true);
+
 	DoorBaseComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DoorPivot"));
 	DoorBaseComponent->Mobility = EComponentMobility::Static;
 	RootComponent = DoorBaseComponent;
@@ -64,7 +66,14 @@ void ATileDoorBase::SetSlideDuration(float NewDuration)
 	DoorSlideDuration = NewDuration > 0 ? NewDuration : DoorSlideDuration;
 }
 
-float ATileDoorBase::GetSlideDuration() const
+void ATileDoorBase::SetLocked(bool bLocked)
 {
-	return DoorSlideDuration;
+	bIsLocked = bLocked;
+	OnLockUpdate();
+}
+
+void ATileDoorBase::SetSealed(bool bSealed)
+{
+	bIsSealed = bSealed;
+	OnLockUpdate();
 }

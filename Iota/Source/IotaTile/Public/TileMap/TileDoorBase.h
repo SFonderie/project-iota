@@ -11,10 +11,8 @@ class USceneComponent;
 /**
  * Base class for door actors spawned during tile map generation. Doors are selected for spawning
  * based on their tileset category and size. Doors without a tileset category will be ignored for
- * spawns.
- *
- * Non-abstract child types should always fill out the Asset ID section under the Class Defaults.
- * Abstract child types can choose to ignore these values.
+ * spawns. Child Blueprints should always fill out the Asset ID section under the Class Defaults,
+ * unless the Blueprint is meant to be abstract.
  */
 UCLASS(Abstract)
 class IOTATILE_API ATileDoorBase : public AAssetActor
@@ -33,6 +31,10 @@ public:
 
 	/** Invoked during collision to stop tracking nearby actors. */
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
+
+	/** Invoked whenever the door lock state updates. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "DoorState")
+	void OnLockUpdate();
 
 	/**
 	 * Determines if the given actor is allowed to interact with the door. The actor must be a
@@ -85,22 +87,35 @@ public:
 	void SetSlideDuration(float NewDuration);
 
 	/**
-	 * Returns the length and maximum value of the door slide animation in seconds.
+	 * Sets the door lock state and notifies Blueprints of the update.
 	 *
-	 * @return Length of the door slide animation in seconds.
+	 * @param bLocked New door lock state.
 	 */
-	float GetSlideDuration() const;
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = true))
+	void SetLocked(bool bLocked);
+
+	/**
+	 * Sets the door lock state and notifies Blueprints of the update.
+	 *
+	 * @param bSealed New door seal state.
+	 */
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = true))
+	void SetSealed(bool bSealed);
 
 	/** Portal dimensions the door is meant to fit within. */
 	UPROPERTY(BlueprintReadOnly, Category = "AssetID", EditDefaultsOnly)
 	FIntPoint DoorSize = FIntPoint(4, 3);
 
+	/** Length and maximum value of the door slide animation in seconds. */
+	UPROPERTY(BlueprintSetter = SetSlideDuration, Category = "DoorSettings", EditAnywhere)
+	float DoorSlideDuration = 1;
+
 	/** Door lock state. While true, the door will close automatically. */
-	UPROPERTY(BlueprintReadWrite, Category = "DoorSettings", EditAnywhere)
+	UPROPERTY(BlueprintSetter = SetLocked, Category = "DoorSettings", EditAnywhere)
 	bool bIsLocked = false;
 
 	/** Door seal state. While true, the door becomes locked shut. */
-	UPROPERTY(BlueprintReadWrite, Category = "DoorSettings", EditAnywhere)
+	UPROPERTY(BlueprintSetter = SetSealed, Category = "DoorSettings", EditAnywhere)
 	bool bIsSealed = false;
 
 private:
@@ -108,10 +123,6 @@ private:
 	/** Door base component used as the door's pivot during placement. */
 	UPROPERTY(BlueprintReadOnly, Category = "Components", VisibleAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> DoorBaseComponent;
-
-	/** Length and maximum value of the door slide animation in seconds. */
-	UPROPERTY(BlueprintSetter = SetSlideDuration, Category = "DoorSettings", EditAnywhere)
-	float DoorSlideDuration = 1;
 
 	/** List of nearby actors used to open the door. */
 	TArray<AActor*> TriggerActors;
