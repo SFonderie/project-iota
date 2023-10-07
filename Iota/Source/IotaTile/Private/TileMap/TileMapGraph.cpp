@@ -35,8 +35,8 @@ void FTileMapGraph::SetLive(bool bLive)
 	{
 		if (UClass* DoorClass = *Request.DoorClass)
 		{
-			// Spawn the new door into the world at the provided transform.
-			ATileDoorBase* NewDoor = World->SpawnActor<ATileDoorBase>(DoorClass, Request.DoorTransform);
+			// Spawn the new door into the world but do not invoke its construction script.
+			ATileDoorBase* NewDoor = World->SpawnActorDeferred<ATileDoorBase>(DoorClass, Request.DoorTransform);
 
 			// Add the new door to the owner edge if one was provided.
 			if (Request.OwnerEdge)
@@ -49,6 +49,9 @@ void FTileMapGraph::SetLive(bool bLive)
 			{
 				NewDoor->bIsSealed = true;
 			}
+
+			// Now that the door has been sealed, finish it.
+			NewDoor->FinishSpawning(Request.DoorTransform);
 		}
 	}
 }

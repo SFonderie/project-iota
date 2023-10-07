@@ -92,7 +92,7 @@ public:
 	float GetSlideDuration() const;
 
 	/** Portal dimensions the door is meant to fit within. */
-	UPROPERTY(Category = "AssetID", EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "AssetID", EditDefaultsOnly)
 	FIntPoint DoorSize = FIntPoint(4, 3);
 
 	/** Door lock state. While true, the door will close automatically. */
