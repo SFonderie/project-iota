@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TileBound.generated.h"
 
-/** Simple oriented bounding box implementation for use in level generation collision checks. */
+/** Simple oriented bounding box implementation for use in tile collision checks. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTileBound
 {

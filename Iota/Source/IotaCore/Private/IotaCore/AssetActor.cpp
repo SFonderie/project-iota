@@ -1,10 +1,10 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "TileGenActor.h"
+#include "IotaCore/AssetActor.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenActor)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(AssetActor)
 
-FPrimaryAssetId ATileGenActor::GetPrimaryAssetId() const
+FPrimaryAssetId AAssetActor::GetPrimaryAssetId() const
 {
 	// Filter out instances by only considering the Class Default Object.
 	if (HasAnyFlags(RF_ClassDefaultObject))
@@ -20,18 +20,18 @@ FPrimaryAssetId ATileGenActor::GetPrimaryAssetId() const
 		UClass* SuperClass = GetClass()->GetSuperClass();
 		UClass* ParentType = nullptr;
 
-		// Immediate children of Tile Gen Actor should only ever be used as parent types.
+		// Immediate children of AAssetActor should only ever be used as parent types.
 		// If this is one such class, return an invalid Asset ID.
-		if (SuperClass == ATileGenActor::StaticClass())
+		if (SuperClass == AAssetActor::StaticClass())
 		{
 			return FPrimaryAssetId();
 		}
 
 		while (SuperClass)
 		{
-			// If the next class up the hierarchy is Tile Gen Actor, then we have reached the root
+			// If the next class up the hierarchy is AAssetActor, then we have reached the root
 			// of the class hierarchy and must use the current super class as the parent type.
-			if (SuperClass->GetSuperClass() == ATileGenActor::StaticClass())
+			if (SuperClass->GetSuperClass() == AAssetActor::StaticClass())
 			{
 				ParentType = SuperClass;
 				break;

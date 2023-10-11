@@ -12,7 +12,7 @@ ATileBoundActor::ATileBoundActor()
 	SetCanBeDamaged(false);
 
 	// Define the bounding box subobject.
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoundingBox"));
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>("BoundingBox");
 	BoxComponent->ShapeColor = FColor(0, 255, 255, 255);
 	BoxComponent->InitBoxExtent(FVector(200, 200, 200));
 	BoxComponent->SetLineThickness(2);
@@ -30,8 +30,8 @@ ATileBoundActor::ATileBoundActor()
 FTileBound ATileBoundActor::GetTileBound() const
 {
 	return FTileBound(
-		BoxComponent->GetComponentLocation(), 
-		BoxComponent->GetComponentRotation(), 
+		BoxComponent->GetComponentLocation(),
+		BoxComponent->GetComponentRotation(),
 		BoxComponent->GetScaledBoxExtent()
 	);
 }

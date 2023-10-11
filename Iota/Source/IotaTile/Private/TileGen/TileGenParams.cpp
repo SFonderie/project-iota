@@ -1,11 +1,13 @@
 // Copyright Sydney Fonderie, 2023. All Rights Reserved.
 
-#include "TileData/TileGenParams.h"
+#include "TileGen/TileGenParams.h"
 #include "TileData/TileScheme.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileGenParams)
 
 FTileGenParams::FTileGenParams()
+	: Location(0, 0, 0)
+	, Rotation(0, 0, 0)
 {
 	// Default constructor.
 }
@@ -14,9 +16,9 @@ FTileGenParams::FTileGenParams(const FTileGenParams& Params)
 	: Tileset(Params.Tileset)
 	, MainObjective(Params.MainObjective)
 	, SideObjectives(Params.SideObjectives)
-	, ObjectiveCount(Params.ObjectiveCount)
-	, Position(Params.Position)
+	, Location(Params.Location)
 	, Rotation(Params.Rotation)
+	, ObjectiveCount(Params.ObjectiveCount)
 	, Length(Params.Length)
 	, Branch(Params.Branch)
 	, Seed(Params.Seed)
@@ -24,7 +26,7 @@ FTileGenParams::FTileGenParams(const FTileGenParams& Params)
 	// Copy constructor.
 }
 
-void FTileGenParams::GetTileSequence(TArray<ETileScheme>& OutSequence) const
+void FTileGenParams::GetSchemeSequence(TArray<ETileScheme>& OutSequence) const
 {
 	OutSequence.Empty(Length);
 	OutSequence.Add(ETileScheme::Start);

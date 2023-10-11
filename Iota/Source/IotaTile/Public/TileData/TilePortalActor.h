@@ -11,7 +11,7 @@ class UBoxComponent;
 class UBillboardComponent;
 class UArrowComponent;
 
-/** Represents a tile connection portal in the world. */
+/** Represents a tile portal in the world. */
 UCLASS()
 class IOTATILE_API ATilePortalActor : public AActor
 {
@@ -22,11 +22,11 @@ public:
 	ATilePortalActor();
 
 	/**
-	 * Converts the actor into a tile portal data structure.
+	 * Converts the actor into a tile portal structure.
 	 *
-	 * @return The actor transform converted into a data-only form.
+	 * @return The actor transform converted into tile data.
 	 */
-	UFUNCTION(BlueprintPure, Category = "LevelGeneration|TilePortal")
+	UFUNCTION(BlueprintPure, Category = "Tile|TilePortal")
 	FTilePortal GetTilePortal() const;
 
 private:
@@ -77,7 +77,7 @@ private:
 
 	/**
 	 * Invoked whenever the user changes the actor rotation using the editor viewport widget. Tile
-	 * portal actor uses this method to keep portals on the XY-plane.
+	 * portal actor uses this method to restrict rotations to the Z-axis.
 	 */
 	virtual void EditorApplyRotation(const FRotator& DeltaRotation, bool bAltDown, bool bShiftDown, bool bCtrlDown) override;
 

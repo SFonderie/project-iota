@@ -16,7 +16,7 @@ ATilePortalActor::ATilePortalActor()
 	SetCanBeDamaged(false);
 
 	// Portal plane component is a box component with a collapsed extent.
-	PlaneComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("PlaneExtent"));
+	PlaneComponent = CreateDefaultSubobject<UBoxComponent>("PlaneExtent");
 	PlaneComponent->ShapeColor = FColor(0, 255, 255, 255);
 	PlaneComponent->InitBoxExtent(FVector(0, 200, 150));
 	PlaneComponent->SetLineThickness(3);
@@ -41,7 +41,7 @@ ATilePortalActor::ATilePortalActor()
 
 		FConstructorStatics()
 			: SpriteObject(TEXT("/Engine/EditorResources/S_TriggerBox"))
-			, ID_TilePortal(TEXT("TilePortal"))
+			, ID_TilePortal("TilePortal")
 			, NAME_TilePortal(NSLOCTEXT("SpriteCategory", "TilePortal", "Tile Portal"))
 		{
 			// Default constructor.
@@ -51,7 +51,7 @@ ATilePortalActor::ATilePortalActor()
 	static FConstructorStatics ConstructorStatics;
 
 	// Define the billboard component subobject.
-	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("HandleSprite"));
+	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>("HandleSprite");
 	SpriteComponent->Sprite = ConstructorStatics.SpriteObject.Get();
 	SpriteComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 	SpriteComponent->bIsScreenSizeScaled = true;
@@ -65,7 +65,7 @@ ATilePortalActor::ATilePortalActor()
 	SpriteComponent->SetupAttachment(PlaneComponent);
 
 	// Define the arrow component subobject.
-	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>(TEXT("DirectionVector"));
+	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>("DirectionVector");
 	ArrowComponent->ArrowColor = FColor(0, 255, 255, 255);
 	ArrowComponent->bIsScreenSizeScaled = true;
 	ArrowComponent->bTreatAsASprite = true;
@@ -85,10 +85,8 @@ ATilePortalActor::ATilePortalActor()
 
 FTilePortal ATilePortalActor::GetTilePortal() const
 {
-	// Ignore the up component of the forward.
-	FVector Forward = GetActorForwardVector();
-	Forward = FVector(Forward.X, Forward.Y, 0);
-	Forward.Normalize();
+	// Use the actor forward vector without its up component.
+	FVector Forward = GetActorForwardVector().GetSafeNormal2D();
 
 	// Round the plane extent to the nearest meter value.
 	FVector PlaneExtent = PlaneComponent->GetScaledBoxExtent();
@@ -97,7 +95,12 @@ FTilePortal ATilePortalActor::GetTilePortal() const
 		FMath::FloorToInt32(PlaneExtent.Z / 50)
 	);
 
-	return FTilePortal(GetActorLocation(), Forward, PlaneSize);
+	// Use the rounded plane extent to re-center the portal on the floor.
+	// Doing so makes spawning tile doors much more intuitive for designers.
+	FVector Location = GetActorLocation() - FVector(0, 0, PlaneSize.Y * 50);
+
+	// Return the resulting tile portal structure.
+	return FTilePortal(Location, Forward, PlaneSize);
 }
 
 #if WITH_EDITOR

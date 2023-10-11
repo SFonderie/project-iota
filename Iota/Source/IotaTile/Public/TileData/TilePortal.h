@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TilePortal.generated.h"
 
-/** Simple bounded plane implementation for use during level generation tile alignment. */
+/** Simple bounded plane implementation for use during tile level alignment. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTilePortal
 {
@@ -52,10 +52,10 @@ public:
 	}
 
 	/**
-	 * Calculates the transform needed to position a level tile into a generated world through the
-	 * connection between the given tile portals.
+	 * Calculates the transform needed to position a new tile within a tile map such that it
+	 * connects via the given tile portals.
 	 *
-	 * @param TilePortal Connection portal from the level tile.
+	 * @param TilePortal Connection portal from the tile level.
 	 * @param WorldPortal Connection portal from the world.
 	 * @return The level-tile-to-world transform.
 	 */

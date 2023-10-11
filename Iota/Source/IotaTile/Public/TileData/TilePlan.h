@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "TilePlan.generated.h"
 
-/** Structure representing a tile planned by level generation. */
+class UPackageMap;
+
+/** Data needed to stream in a tile level. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTilePlan
 {
@@ -13,35 +15,53 @@ struct IOTATILE_API FTilePlan
 
 public:
 
-	/** Tile level instance pointer. */
+	/** Pointer to the tile level asset. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSoftObjectPtr<UWorld> Level;
 
-	/** Tile level world position. */
+	/** Tile level location in world space. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector Position;
+	FVector Location;
 
-	/** Tile level world rotation. */
+	/** Tile level rotation in world space. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FRotator Rotation;
 
-	/** Creates an empty tile plan. */
+	/** Defines a default tile plan. */
 	FTilePlan();
 
 	/**
-	 * Creates a standard tile plan.
+	 * Defines a new tile plan.
 	 *
-	 * @param InLevel Soft object pointer to the planned tile level.
-	 * @param InPosition Planned position of the tile level in world space.
-	 * @param InRotation Planned rotation of the tile level in world space.
+	 * @param InLevel Soft pointer to the tile level to actually load.
+	 * @param InLocation Tile level location in world space.
+	 * @param InRotation Tile level rotation in world space.
 	 */
-	FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InPosition, const FRotator& InRotation);
+	FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLocation, const FRotator& InRotation);
 
 	/**
-	 * Duplicates the given tile plan and optionally transforms it.
+	 * Duplicates the provided tile plan or tile generation plan.
 	 *
 	 * @param TilePlan Tile plan to duplicate.
-	 * @param Transform Transform to be applied to the new plan.
 	 */
-	FTilePlan(const FTilePlan& TilePlan, const FTransform& Transform = FTransform::Identity);
+	FTilePlan(const FTilePlan& TilePlan);
+
+	/**
+	 * Compresses the tile plan to minimize its network size.
+	 *
+	 * @param Archive Archive object from which to read and write.
+	 * @param PackageMap Package map for resolving UObject pointers.
+	 * @param bOutSuccess True if no errors were encountered.
+	 * @return True if the tile plan was fully serialized.
+	 */
+	bool NetSerialize(FArchive& Archive, UPackageMap* PackageMap, bool& bOutSuccess);
+};
+
+template<>
+struct TStructOpsTypeTraits<FTilePlan> : public TStructOpsTypeTraitsBase2<FTilePlan>
+{
+	enum
+	{
+		WithNetSerializer = true
+	};
 };

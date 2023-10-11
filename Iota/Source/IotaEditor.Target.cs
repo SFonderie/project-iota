@@ -16,6 +16,6 @@ public class IotaEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
-		ExtraModuleNames.Add("IotaCore");
+		ExtraModuleNames.Add("IotaGame");
 	}
 }

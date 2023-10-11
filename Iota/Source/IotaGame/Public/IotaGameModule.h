@@ -6,18 +6,18 @@
 #include "Modules/ModuleInterface.h"
 
 /** Game module class representing IotaCore. */
-class FIotaCoreModule : public IModuleInterface
+class FIotaGameModule : public IModuleInterface
 {
 
 public:
 
-	/** Invoked to initialize IotaCore during module startup. */
+	/** Invoked to initialize IotaGame during module startup. */
 	virtual void StartupModule() override;
 
-	/** Invoked to unload IotaCore safely during module shutdown. */
+	/** Invoked to unload IotaGame safely during module shutdown. */
 	virtual void ShutdownModule() override;
 
-	/** Marks IotaCore as a gameplay module. Always returns true. */
+	/** Marks IotaGame as a gameplay module. Always returns true. */
 	virtual bool IsGameModule() const override
 	{
 		return true;

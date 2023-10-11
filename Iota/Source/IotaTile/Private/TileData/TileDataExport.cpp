@@ -18,7 +18,7 @@ ATileDataExport::ATileDataExport()
 	SetCanBeDamaged(false);
 
 	// Export scene component is a standard static scene component.
-	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRoot");
 	SceneComponent->Mobility = EComponentMobility::Static;
 	RootComponent = SceneComponent;
 
@@ -32,7 +32,7 @@ ATileDataExport::ATileDataExport()
 
 		FConstructorStatics()
 			: SpriteObject(TEXT("/Engine/EditorResources/S_TriggerSphere"))
-			, ID_TileExport(TEXT("TileExport"))
+			, ID_TileExport("TileExport")
 			, NAME_TileExport(NSLOCTEXT("SpriteCategory", "TileExport", "Tile Export"))
 		{
 			// Default constructor.
@@ -42,7 +42,7 @@ ATileDataExport::ATileDataExport()
 	static FConstructorStatics ConstructorStatics;
 
 	// Define the billboard component subobject.
-	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("HandleSprite"));
+	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>("HandleSprite");
 	SpriteComponent->Sprite = ConstructorStatics.SpriteObject.Get();
 	SpriteComponent->bIsScreenSizeScaled = true;
 
@@ -61,7 +61,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
-	if (GIsEditor && GetWorld())
+	if (GIsEditor && GetWorld() && !GetWorld()->HasBegunPlay())
 	{
 		if (DataAsset.IsNull() && bAutoCreateAsset)
 		{
@@ -112,7 +112,7 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 
 				// Get the package path relative to the local disk.
 				FString FileName = FPackageName::LongPackageNameToFilename(
-					AssetPackage->GetName(), 
+					AssetPackage->GetName(),
 					FPackageName::GetAssetPackageExtension()
 				);
 

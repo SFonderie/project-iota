@@ -5,25 +5,37 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TilePlan)
 
 FTilePlan::FTilePlan()
-	: Level(nullptr)
-	, Position(0, 0, 0)
+	: Location(0, 0, 0)
 	, Rotation(0, 0, 0)
 {
 	// Default constructor.
 }
 
-FTilePlan::FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InPosition, const FRotator& InRotation)
+FTilePlan::FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLocation, const FRotator& InRotation)
 	: Level(InLevel)
-	, Position(InPosition)
+	, Location(InLocation)
 	, Rotation(InRotation)
 {
 	// Complete constructor.
 }
 
-FTilePlan::FTilePlan(const FTilePlan& TilePlan, const FTransform& Transform)
+FTilePlan::FTilePlan(const FTilePlan& TilePlan)
 	: Level(TilePlan.Level)
-	, Position(Transform.TransformPosition(TilePlan.Position))
-	, Rotation(Transform.TransformRotation(TilePlan.Rotation.Quaternion()).Rotator())
+	, Location(TilePlan.Location)
+	, Rotation(TilePlan.Rotation)
 {
 	// Copy constructor.
+}
+
+bool FTilePlan::NetSerialize(FArchive& Archive, UPackageMap* PackageMap, bool& bOutSuccess)
+{
+	FString AssetPath = Level.ToString();
+	Archive << AssetPath;
+	Level = AssetPath;
+
+	Location.NetSerialize(Archive, PackageMap, bOutSuccess);
+	Rotation.NetSerialize(Archive, PackageMap, bOutSuccess);
+
+	bOutSuccess = true;
+	return true;
 }

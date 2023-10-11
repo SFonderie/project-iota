@@ -16,5 +16,8 @@ public class IotaTile : ModuleRules
 
 		// SPECIFIC MODULES
 		PublicDependencyModuleNames.Add("GameplayTags");
+
+		// IOTA MODULES
+		PublicDependencyModuleNames.Add("IotaCore");
 	}
 }
