@@ -176,6 +176,16 @@ public:
 	}
 
 	/**
+	 * Returns the number of entries currently collected in the actor table.
+	 *
+	 * @return Number of actor types stored in the table.
+	 */
+	int32 GetSize() const
+	{
+		return Table.Num();
+	}
+
+	/**
 	 * Returns the list of actor subtypes associated with the provided key and appends them to the
 	 * provided array. If no subtypes were found, the provided list will return as-is.
 	 *

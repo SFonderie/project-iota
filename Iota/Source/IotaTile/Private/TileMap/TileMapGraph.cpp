@@ -28,30 +28,32 @@ bool FTileMapGraph::IsLive() const
 
 void FTileMapGraph::SetLive(bool bLive)
 {
-	bLiveGraph = true;
+	bLiveGraph = bLive;
 
-	// Graph is live; handle all door requests and spawn them into the world.
-	for (const FTileDoorRequest& Request : DoorRequests)
+	if (bLiveGraph)
 	{
-		if (UClass* DoorClass = *Request.DoorClass)
+		for (const FTileDoorRequest& Request : DoorRequests)
 		{
-			// Spawn the new door into the world but do not invoke its construction script.
-			ATileDoorBase* NewDoor = World->SpawnActorDeferred<ATileDoorBase>(DoorClass, Request.DoorTransform);
-
-			// Add the new door to the owner edge if one was provided.
-			if (Request.OwnerEdge)
+			if (UClass* DoorClass = *Request.DoorClass)
 			{
-				Request.OwnerEdge->DoorActor = NewDoor;
-			}
+				// Spawn the new door into the world but do not invoke its construction script.
+				ATileDoorBase* NewDoor = World->SpawnActorDeferred<ATileDoorBase>(DoorClass, Request.DoorTransform);
 
-			// Otherwise, seal the door since it has no connection.
-			else
-			{
-				NewDoor->bIsSealed = true;
-			}
+				// Add the new door to the owner edge if one was provided.
+				if (Request.OwnerEdge)
+				{
+					Request.OwnerEdge->DoorActor = NewDoor;
+				}
 
-			// Now that the door has been sealed, finish it.
-			NewDoor->FinishSpawning(Request.DoorTransform);
+				// Otherwise, seal the door since it has no connection.
+				else
+				{
+					NewDoor->bIsSealed = true;
+				}
+
+				// Now that the door has been sealed, finish it.
+				NewDoor->FinishSpawning(Request.DoorTransform);
+			}
 		}
 	}
 }
