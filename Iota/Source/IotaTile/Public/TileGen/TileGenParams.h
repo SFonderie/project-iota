@@ -58,6 +58,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 Seed = 0;
 
+	/** List of Asset Actor types to load with the tile map. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FPrimaryAssetType> AssetActors;
+
 	/** Creates a default parameter set. */
 	FTileGenParams();
 

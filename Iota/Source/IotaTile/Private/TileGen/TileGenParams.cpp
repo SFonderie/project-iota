@@ -22,6 +22,7 @@ FTileGenParams::FTileGenParams(const FTileGenParams& Params)
 	, Length(Params.Length)
 	, Branch(Params.Branch)
 	, Seed(Params.Seed)
+	, AssetActors(Params.AssetActors)
 {
 	// Copy constructor.
 }
