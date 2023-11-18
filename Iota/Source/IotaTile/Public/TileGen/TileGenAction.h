@@ -22,7 +22,7 @@ public:
 	 * delegate once generation is complete.
 	 *
 	 * @param InParams Tile map generation parameters.
-	 * @param InDelegate
+	 * @param InDelegate Delegate invoked when the action generates a map.
 	 */
 	FTileGenAction(const FTileGenParams& InParams, const FSimpleDelegate& InDelegate);
 
@@ -71,7 +71,7 @@ public:
 
 private:
 
-	/** Invoked by the engine when it has loaded the tile data assets that the action requested. */
+	/** Invoked by the engine when it has loaded the assets the action requested. */
 	void NotifyAssetsLoaded();
 
 private:
@@ -79,11 +79,11 @@ private:
 	/** Delegate invoked when the generation action completes. */
 	FSimpleDelegate OnComplete;
 
-	/** Tile data assets requested by the action. */
-	TArray<FPrimaryAssetId> TileAssetList;
+	/** Assets requested by the action. */
+	TArray<FPrimaryAssetId> ActionAssetList;
 
-	/** Handle used to track data asset loading. */
-	TSharedPtr<FStreamableHandle> DataAssetHandle;
+	/** Handle used to track asset loading. */
+	TSharedPtr<FStreamableHandle> ActionAssetHandle;
 
 	/** Asynchronous worker dispatched by the action. */
 	TSharedPtr<FTileGenWorker> AsyncWorker;

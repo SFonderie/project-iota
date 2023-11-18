@@ -8,7 +8,8 @@
 #include "Engine/AssetManager.h"
 
 /**
- * Collects and stores AAssetActor subtypes in a map keyed to a custom value type.
+ * Collects and stores AAssetActor subtypes in a map keyed to a custom value type. Subtypes must
+ * be loaded to be collected; use the Asset Manager to handle this.
  *
  * @param KeyType Value type to pass to the internal multi-map for use as keys.
  * @param ActorType Actor type for which to collect subtypes. Must derive from AAssetActor.
@@ -173,6 +174,16 @@ public:
 		}
 
 		return TSubclassOf<ActorType>();
+	}
+
+	/**
+	 * Returns the number of entries currently collected in the actor table.
+	 *
+	 * @return Number of actor types stored in the table.
+	 */
+	int32 GetSize() const
+	{
+		return Table.Num();
 	}
 
 	/**

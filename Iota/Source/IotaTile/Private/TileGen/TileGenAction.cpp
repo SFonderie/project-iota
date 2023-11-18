@@ -13,7 +13,7 @@ FTileGenAction::FTileGenAction(const FTileGenParams& InParams, const FSimpleDele
 {
 	UAssetManager& AssetManager = UAssetManager::Get();
 
-	// Load all asset registry data about tile data assets into a list so that it can be filtered.
+	// Load all asset data matching the tile data asset type into a list.
 	TArray<FAssetData> TileAssetData;
 	AssetManager.GetPrimaryAssetDataList(UTileDataAsset::StaticClass()->GetFName(), TileAssetData);
 
@@ -30,57 +30,71 @@ FTileGenAction::FTileGenAction(const FTileGenParams& InParams, const FSimpleDele
 
 			if (AssetDataTag == Params.Tileset)
 			{
-				TileAssetList.Emplace(AssetData.GetPrimaryAssetId());
+				ActionAssetList.Emplace(AssetData.GetPrimaryAssetId());
 			}
 		}
 	}
 
-	// Load the compiled list of tile data assets and invoke the next phase when complete. Note
-	// that the Asset Manager will keep the assets loaded until they are manually released, so the
-	// action will need to unload them prior to destruction.
+	// Add each asset type associated with the parameter actor types into the asset list as well.
+	// FTileGenAction handles loading these types because doing so elsewhere would be cumbersome.
+	for (const FPrimaryAssetType& AssetActor : Params.AssetActors)
+	{
+		TArray<FAssetData> AssetActorData;
+		AssetManager.GetPrimaryAssetDataList(AssetActor, AssetActorData);
+
+		for (const FAssetData& AssetData : AssetActorData)
+		{
+			ActionAssetList.Emplace(AssetData.GetPrimaryAssetId());
+		}
+	}
+
+	// Load the compiled list of assets and invoke the next phase when complete. Note that the 
+	// Asset Manager will keep the assets loaded until they are manually released, so the action
+	// will need to unload them prior to destruction.
 	FStreamableDelegate Callback = FStreamableDelegate::CreateRaw(this, &FTileGenAction::NotifyAssetsLoaded);
-	DataAssetHandle = AssetManager.LoadPrimaryAssets(TileAssetList, TArray<FName>(), Callback);
+	ActionAssetHandle = AssetManager.LoadPrimaryAssets(ActionAssetList, TArray<FName>(), Callback);
 }
 
 FTileGenAction::~FTileGenAction()
 {
 	// NotifyAssetsLoaded handles releasing Asset Manager resources and clears the handle when it
 	// completes. If the handle is still valid, therefore, NotifyAssetsLoaded has not run yet and
-	// resources need to be cleared manually.
-	if (DataAssetHandle.IsValid())
+	// will be called from a dangling pointer.
+	if (ActionAssetHandle.IsValid())
 	{
 		// Cancel the data asset handle so that it does not try to execute NotifyAssetsLoaded on
 		// the soon-to-be-deleted action, as doing so would cause an access violation.
-		DataAssetHandle->CancelHandle();
-
-		// If the tile asset list is not manually unloaded it will persist in memory forever.
-		UAssetManager::Get().UnloadPrimaryAssets(TileAssetList);
+		ActionAssetHandle->CancelHandle();
 	}
+
+	// Attempt to release all requested assets so that their memory can be reclaimed.
+	// Do this regardless of load state since assets might be partially loaded.
+	UAssetManager::Get().UnloadPrimaryAssets(ActionAssetList);
 }
 
 void FTileGenAction::NotifyAssetsLoaded()
 {
 	UAssetManager& AssetManager = UAssetManager::Get();
 
-	// Create an array of loaded assets.
+	// Create an array of loaded tile data assets.
 	TArray<UTileDataAsset*> TileDataAssets;
 
-	// Access each loaded tile data asset and store them in an array.
-	for (const FPrimaryAssetId& AssetID : TileAssetList)
+	// Filter and extract tile data assets from the assets loaded by the action and place them in
+	// an array that can then be fed to the generation worker.
+	for (const FPrimaryAssetId& AssetID : ActionAssetList)
 	{
-		TileDataAssets.Emplace(AssetManager.GetPrimaryAssetObject<UTileDataAsset>(AssetID));
+		if (AssetID.PrimaryAssetType == UTileDataAsset::StaticClass()->GetFName())
+		{
+			TileDataAssets.Emplace(AssetManager.GetPrimaryAssetObject<UTileDataAsset>(AssetID));
+		}
 	}
 
 	// Create the generation worker, which handles the rest of the process.
 	// Doing so also starts the worker, so the action is done running for now.
 	AsyncWorker = MakeShared<FTileGenWorker>(Params, TileDataAssets, OnComplete);
 
-	// Now that the generation worker exists the tile data assets can be safely unloaded.
-	// We need to do this because the otherwise the assets will persist in memory forever.
-	AssetManager.UnloadPrimaryAssets(TileAssetList);
-
-	// Empty the handle to indicate to other methods that resources have been dumped.
-	DataAssetHandle.Reset();
+	// Clear the handle so that the destructor knows the action is safe.
+	ActionAssetHandle.Reset();
 }
 
 void FTileGenAction::Regenerate()
