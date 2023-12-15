@@ -1,5 +1,16 @@
-// Copyright Sydney Fonderie, 2024. All Rights Reserved.
+// Copyright Sydney Fonderie. All Rights Reserved.
 
+#include "IotaGameModule.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, IotaGame, "Iota");
+void FIotaGameModule::StartupModule()
+{
+	// Initialize Resources
+}
+
+void FIotaGameModule::ShutdownModule()
+{
+	// Release Resources
+}
+
+IMPLEMENT_PRIMARY_GAME_MODULE(FIotaGameModule, IotaGame, "Iota");

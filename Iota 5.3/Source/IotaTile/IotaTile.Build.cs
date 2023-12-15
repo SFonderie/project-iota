@@ -2,17 +2,15 @@
 
 using UnrealBuildTool;
 
-public class IotaGame : ModuleRules
+public class IotaTile : ModuleRules
 {
-	public IotaGame(ReadOnlyTargetRules Target) : base(Target)
+	public IotaTile(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.Add("Core");
 		PublicDependencyModuleNames.Add("CoreUObject");
 		PublicDependencyModuleNames.Add("Engine");
-		PublicDependencyModuleNames.Add("InputCore");
-
-		PublicDependencyModuleNames.Add("IotaTile");
+		PublicDependencyModuleNames.Add("GameplayTags");
 	}
 }

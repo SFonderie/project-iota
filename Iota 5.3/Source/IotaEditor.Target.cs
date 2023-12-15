@@ -1,4 +1,4 @@
-// Copyright Sydney Fonderie, 2024. All Rights Reserved.
+// Copyright Sydney Fonderie. All Rights Reserved.
 
 using UnrealBuildTool;
 
