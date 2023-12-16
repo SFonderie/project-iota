@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TilePortal.generated.h"
 
-/** Bounded plane structure through which tiles can connect to one another. */
+/** Bounded plane structure through which one tile can connect to another. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTilePortal
 {
