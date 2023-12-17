@@ -7,6 +7,8 @@
 #include "TileData/TilePortal.h"
 #include "TileData.generated.h"
 
+class UTileDataAsset;
+
 /** Minimal data structure needed to physically describe a tile. */
 USTRUCT(BlueprintType)
 struct IOTATILE_API FTileData
@@ -28,43 +30,20 @@ public:
 	TArray<FTileBound> Bounds;
 
 	/** Defines an empty tile data structure. */
-	FTileData();
+	FTileData() = default;
 
 	/**
-	 * Defines a tile data structure using the provided attributes.
+	 * Defines a tile data structure from the provided data asset base.
 	 *
-	 * @param InLevel Pointer to the tile level asset.
-	 * @param InPortals A list of the tile's exit portals.
-	 * @param InBounds A list of the tile's collision bounds.
+	 * @param InDataAsset Tile data asset from which to build.
 	 */
-	FTileData(const TSoftObjectPtr<UWorld>& InLevel, const TArray<FTilePortal>& InPortals, const TArray<FTileBound>& InBounds);
+	FTileData(const UTileDataAsset* InDataAsset);
 
 	/**
-	 * Duplicates the given tile data and optionally transforms its components.
+	 * Transforms the tile data and returns the result.
 	 *
-	 * @param TileData Tile data structure to duplicate.
 	 * @param Transform Transform to be applied to the new data.
+	 * @return Transformed tile data.
 	 */
-	FTileData(const FTileData& TileData, const FTransform& Transform = FTransform::Identity);
-
-	/**
-	 * Moves the contents of the given tile data into a new structure.
-	 *
-	 * @param TileData Tile data structure to move.
-	 */
-	FTileData(FTileData&& TileData) noexcept;
-
-	/**
-	 * Duplicates the given tile data for assignment.
-	 * 
-	 * @param TileData Tile data structure to duplicate.
-	 */
-	FTileData& operator=(const FTileData& TileData);
-
-	/**
-	 * Moves the contents of the given tile data via assignment.
-	 * 
-	 * @param TileData Tile data structure to move.
-	 */
-	FTileData& operator=(FTileData&& TileData) noexcept;
+	FTileData WithTransform(const FTransform& Transform) const;
 };

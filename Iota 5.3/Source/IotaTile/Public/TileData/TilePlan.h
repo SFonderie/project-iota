@@ -25,8 +25,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FRotator Rotation;
 
-	/** Defines a default tile plan. */
-	FTilePlan();
+	/** Defines an empty tile plan. */
+	FTilePlan() = default;
 
 	/**
 	 * Defines a new tile plan.
@@ -36,11 +36,4 @@ public:
 	 * @param InRotation Tile level rotation in world space.
 	 */
 	FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLocation, const FRotator& InRotation);
-
-	/**
-	 * Duplicates the given tile plan.
-	 *
-	 * @param TilePlan Tile plan to duplicate.
-	 */
-	FTilePlan(const FTilePlan& TilePlan);
 };

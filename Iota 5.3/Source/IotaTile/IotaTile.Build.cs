@@ -13,9 +13,14 @@ public class IotaTile : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
-				"AssetRegistry",
 				"GameplayTags",
 			}
+		);
+
+		PrivateDependencyModuleNames.AddRange(
+			new string[] {
+				"AssetRegistry",
+			}	
 		);
 	}
 }

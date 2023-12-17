@@ -3,6 +3,7 @@
 #include "TileData/TileDataLibrary.h"
 #include "TileData/TileBound.h"
 #include "TileData/TileData.h"
+#include "TileData/TileDataAsset.h"
 #include "TileData/TilePortal.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileDataLibrary)
@@ -12,9 +13,24 @@ bool UTileDataLibrary::TileBoundCollision(const FTileBound& A, const FTileBound&
 	return FTileBound::CheckCollision(A, B);
 }
 
-void UTileDataLibrary::TransformTileBound(const FTileBound& TileBound, const FTransform& Transform, FTileBound& NewBound)
+FTileBound UTileDataLibrary::TransformTileBound(const FTileBound& TileBound, const FTransform& Transform)
 {
-	NewBound = FTileBound(TileBound, Transform);
+	return FTileBound(TileBound, Transform);
+}
+
+FTransform UTileDataLibrary::ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
+{
+	return FTilePortal::ConnectionTransform(TilePortal, WorldPortal);
+}
+
+FTilePortal UTileDataLibrary::TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform)
+{
+	return FTilePortal(TilePortal, Transform);
+}
+
+FTileData UTileDataLibrary::GetTileData(const UTileDataAsset* DataAsset)
+{
+	return FTileData(DataAsset);
 }
 
 bool UTileDataLibrary::TileCollision(const FTileData& A, const FTileData& B)
@@ -33,17 +49,7 @@ bool UTileDataLibrary::TileCollision(const FTileData& A, const FTileData& B)
 	return false;
 }
 
-void UTileDataLibrary::TransformTile(const FTileData& TileData, const FTransform& Transform, FTileData& NewTile)
+FTileData UTileDataLibrary::TransformTile(const FTileData& TileData, const FTransform& Transform)
 {
-	NewTile = FTileData(TileData, Transform);
-}
-
-FTransform UTileDataLibrary::ConnectionTransform(const FTilePortal& TilePortal, const FTilePortal& WorldPortal)
-{
-	return FTilePortal::ConnectionTransform(TilePortal, WorldPortal);
-}
-
-void UTileDataLibrary::TransformTilePortal(const FTilePortal& TilePortal, const FTransform& Transform, FTilePortal& NewPortal)
-{
-	NewPortal = FTilePortal(TilePortal, Transform);
+	return TileData.WithTransform(Transform);
 }

@@ -42,12 +42,4 @@ public:
 	/** A list of the tile's collision bounds. */
 	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTileBound> Bounds;
-
-	/**
-	 * Converts the tile data asset into generation data.
-	 *
-	 * @return The tile data asset coverted into a struct.
-	 */
-	UFUNCTION(BlueprintPure, Category = "Tile|TileData")
-	FTileData GetTileData() const;
 };
