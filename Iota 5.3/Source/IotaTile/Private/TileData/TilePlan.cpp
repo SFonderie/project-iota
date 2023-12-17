@@ -5,7 +5,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TilePlan)
 
 FTilePlan::FTilePlan()
-	: Location(0, 0, 0)
+	: Level()
+	, Location(0, 0, 0)
 	, Rotation(0, 0, 0)
 {
 	// Default constructor.

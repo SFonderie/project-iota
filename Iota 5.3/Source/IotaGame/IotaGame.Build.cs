@@ -8,11 +8,14 @@ public class IotaGame : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.Add("Core");
-		PublicDependencyModuleNames.Add("CoreUObject");
-		PublicDependencyModuleNames.Add("Engine");
-		PublicDependencyModuleNames.Add("InputCore");
-
-		PublicDependencyModuleNames.Add("IotaTile");
+		PublicDependencyModuleNames.AddRange(
+			new string[] {
+				"Core",
+				"CoreUObject",
+				"Engine",
+				"InputCore",
+				"IotaTile",
+			}
+		);
 	}
 }

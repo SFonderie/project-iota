@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleInterface.h"
 
-class FIotaGameModule : public IModuleInterface
+class IOTAGAME_API FIotaGameModule : public IModuleInterface
 {
 
 public:

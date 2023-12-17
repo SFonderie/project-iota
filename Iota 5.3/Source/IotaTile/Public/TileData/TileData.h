@@ -42,8 +42,29 @@ public:
 	/**
 	 * Duplicates the given tile data and optionally transforms its components.
 	 *
-	 * @param Tile Data Tile data structure to duplicate.
-	 * @param Transform World transform to apply to the data.
+	 * @param TileData Tile data structure to duplicate.
+	 * @param Transform Transform to be applied to the new data.
 	 */
 	FTileData(const FTileData& TileData, const FTransform& Transform = FTransform::Identity);
+
+	/**
+	 * Moves the contents of the given tile data into a new structure.
+	 *
+	 * @param TileData Tile data structure to move.
+	 */
+	FTileData(FTileData&& TileData) noexcept;
+
+	/**
+	 * Duplicates the given tile data for assignment.
+	 * 
+	 * @param TileData Tile data structure to duplicate.
+	 */
+	FTileData& operator=(const FTileData& TileData);
+
+	/**
+	 * Moves the contents of the given tile data via assignment.
+	 * 
+	 * @param TileData Tile data structure to move.
+	 */
+	FTileData& operator=(FTileData&& TileData) noexcept;
 };

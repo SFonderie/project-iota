@@ -26,8 +26,8 @@ public:
 	TSoftObjectPtr<UTileDataAsset> DataAsset;
 
 	/** Export the tile with these preferred schemes. */
-	UPROPERTY(Category = "ExportLevel", EditAnywhere, meta = (Bitmask, BitmaskEnum = "/Script/IotaTile.ETileScheme"))
-	int32 PreferredSchemes = 1 << ETileScheme::Connector;
+	UPROPERTY(Category = "ExportLevel", EditAnywhere, meta = (Bitmask, BitmaskEnum = ETileScheme))
+	int32 Schemes = 1 << ETileScheme::Connector;
 
 	/** Tileset to which the tile belongs. */
 	UPROPERTY(Category = "ExportData", EditAnywhere, meta = (Categories = "Tileset"))
@@ -65,8 +65,12 @@ private:
 
 #endif
 
+#if WITH_EDITOR
+
 protected:
 
 	/** Actually exports the actor into the linked data asset. */
 	virtual void PreSave(FObjectPreSaveContext ObjectSaveContext) override;
+
+#endif
 };

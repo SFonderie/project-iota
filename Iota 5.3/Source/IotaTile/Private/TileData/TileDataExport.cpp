@@ -7,6 +7,8 @@
 #include "UObject/ObjectSaveContext.h"
 #include "UObject/SavePackage.h"
 #include "UObject/Package.h"
+#include "Engine/Level.h"
+#include "Engine/World.h"
 #include "Engine/Texture2D.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
@@ -57,57 +59,79 @@ ATileDataExport::ATileDataExport()
 #endif
 }
 
+#if WITH_EDITOR
+
 void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 {
 	Super::PreSave(ObjectSaveContext);
 
-	if (GIsEditor && GetWorld() && !GetWorld()->HasBegunPlay())
+	UWorld* World = GetWorld();
+	ULevel* Level = GetLevel();
+
+	if (GIsEditor && IsValid(World) && IsValid(Level))
 	{
-		if (DataAsset.IsNull() && bAutoCreateAsset)
+		if (Level->IsPersistentLevel() && !World->HasBegunPlay())
 		{
-			// Isolate the tileset tag name.
-			FString TilesetName = Tileset.ToString();
-			FString ParentName = Tileset.RequestDirectParent().ToString();
-			TilesetName.RemoveFromStart(ParentName + TEXT("."));
+			UTileDataAsset* AssetObject = nullptr;
+			UPackage* AssetPackage = nullptr;
+			bool bNewAsset = false;
 
-			// Create the package name from the level and a default folder.
-			FString AssetName = GetWorld()->GetMapName() + TEXT("_TileData");
-			FString PackageName = TEXT("/Game/TileData/") + TilesetName + TEXT("/Tiles/") + AssetName;
-
-			// Create a new package for the tile data asset.
-			UPackage* NewPackage = CreatePackage(*PackageName);
-			NewPackage->FullyLoad();
-
-			// Create the actual tile data asset, register it, and then save the reference.
-			UTileDataAsset* NewDataAsset = NewObject<UTileDataAsset>(NewPackage, *AssetName, RF_Public | RF_Standalone);
-			FAssetRegistryModule::AssetCreated(NewDataAsset);
-			DataAsset = NewDataAsset;
-		}
-
-		if (UTileDataAsset* DataAssetObject = DataAsset.LoadSynchronous())
-		{
-			DataAssetObject->Level = GetWorld();
-			DataAssetObject->Schemes = PreferredSchemes;
-			DataAssetObject->Tileset = Tileset;
-			DataAssetObject->Objectives = Objectives;
-			DataAssetObject->Portals.Empty(PortalActors.Num());
-			DataAssetObject->Bounds.Empty(BoundActors.Num());
-
-			for (const ATilePortalActor* TilePortalActor : PortalActors)
+			// If no data asset is linked but the export actor is authorized to create one, then
+			// create a new data asset inside of the linked tilset's tile data content folder.
+			if (DataAsset.IsNull() && Tileset.IsValid() && bAutoCreateAsset)
 			{
-				// Export each tile portal actor as a tile portal structure.
-				DataAssetObject->Portals.Emplace(TilePortalActor->GetTilePortal());
+				// Isolate the tileset name so that it can be used as a folder name.
+				FString TilesetName = Tileset.ToString();
+				FString ParentName = Tileset.RequestDirectParent().ToString();
+				TilesetName.RemoveFromStart(ParentName + TEXT("."));
+
+				// Create the new asset name and package path needed for the new asset.
+				FString AssetName = World->GetMapName() + TEXT("_TileData");
+				FString PackageName = TEXT("/Game/TileData/") + TilesetName + TEXT("/Tiles/") + AssetName;
+
+				// Create a package for the new asset.
+				AssetPackage = CreatePackage(*PackageName);
+				AssetPackage->FullyLoad();
+
+				// Create the new asset inside of the new package.
+				EObjectFlags Flags = RF_Public | RF_Standalone | RF_Transactional;
+				AssetObject = NewObject<UTileDataAsset>(AssetPackage, *AssetName, Flags);
+
+				// Notify the asset registry of the new addition and mark it internally.
+				FAssetRegistryModule::AssetCreated(AssetObject);
+				bNewAsset = true;
 			}
 
-			for (const ATileBoundActor* TileBoundActor : BoundActors)
+			// Attempt to extract the asset object and its package from the linked data asset.
+			else if (UTileDataAsset* LinkAssetObject = DataAsset.LoadSynchronous())
 			{
-				// Export each tile bound actor as a tile bound structure.
-				DataAssetObject->Bounds.Emplace(TileBoundActor->GetTileBound());
+				AssetObject = LinkAssetObject;
+				AssetPackage = AssetObject->GetPackage();
 			}
 
-			if (UPackage* AssetPackage = DataAssetObject->GetPackage())
+			// Ensure that both the asset object and its package are valid before save.
+			if (IsValid(AssetObject) && IsValid(AssetPackage))
 			{
-				// Mark the package for saving.
+				AssetObject->Level = World;
+				AssetObject->Schemes = Schemes;
+				AssetObject->Tileset = Tileset;
+				AssetObject->Objectives = Objectives;
+				AssetObject->Portals.Empty(PortalActors.Num());
+				AssetObject->Bounds.Empty(BoundActors.Num());
+				// TODO - AreaGraph Export
+
+				for (const ATilePortalActor* TilePortalActor : PortalActors)
+				{
+					// Export each tile portal actor as a tile portal structure.
+					AssetObject->Portals.Emplace(TilePortalActor->GetTilePortal());
+				}
+
+				for (const ATileBoundActor* TileBoundActor : BoundActors)
+				{
+					// Export each tile bound actor as a tile bound structure.
+					AssetObject->Bounds.Emplace(TileBoundActor->GetTileBound());
+				}
+
 				AssetPackage->MarkPackageDirty();
 
 				// Get the package path relative to the local disk.
@@ -116,9 +140,15 @@ void ATileDataExport::PreSave(FObjectPreSaveContext ObjectSaveContext)
 					FPackageName::GetAssetPackageExtension()
 				);
 
-				// Attempt to actually save the package and its contents.
-				UPackage::SavePackage(AssetPackage, DataAssetObject, *FileName, FSavePackageArgs());
+				// Attempt to actually save the package and its contents. If the asset and package
+				// were created as part of this function call, link them in the actor as well.
+				if (UPackage::SavePackage(AssetPackage, AssetObject, *FileName, FSavePackageArgs()) && bNewAsset)
+				{
+					DataAsset = AssetObject;
+				}
 			}
 		}
 	}
 }
+
+#endif

@@ -38,7 +38,7 @@ public:
 	FTilePlan(const TSoftObjectPtr<UWorld>& InLevel, const FVector& InLocation, const FRotator& InRotation);
 
 	/**
-	 * Duplicates the provided tile plan or tile generation plan.
+	 * Duplicates the given tile plan.
 	 *
 	 * @param TilePlan Tile plan to duplicate.
 	 */

@@ -8,9 +8,14 @@ public class IotaTile : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.Add("Core");
-		PublicDependencyModuleNames.Add("CoreUObject");
-		PublicDependencyModuleNames.Add("Engine");
-		PublicDependencyModuleNames.Add("GameplayTags");
+		PublicDependencyModuleNames.AddRange(
+			new string[] {
+				"Core",
+				"CoreUObject",
+				"Engine",
+				"AssetRegistry",
+				"GameplayTags",
+			}
+		);
 	}
 }
