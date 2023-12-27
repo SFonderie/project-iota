@@ -4,18 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TileData/TileDataAsset.h"
-#include "TileData/TilePortalActor.h"
-#include "TileData/TileBoundActor.h"
+#include "TileData/TileScheme.h"
 #include "GameplayTagContainer.h"
 #include "TileDataExport.generated.h"
 
+class UTileDataAsset;
+class ATileBoundActor;
+class ATilePortalActor;
+class ATileNodeActor;
 class USceneComponent;
 class UBillboardComponent;
 
 /** Exports tile level data to a linked asset. */
 UCLASS()
-class IOTATILE_API ATileDataExport : public AActor
+class ATileDataExport : public AActor
 {
 	GENERATED_BODY()
 
@@ -38,23 +40,31 @@ public:
 	FGameplayTagContainer Objectives;
 
 	/** Tile portal actors that should be exported. */
-	UPROPERTY(Category = "ExportActors", EditAnywhere)
+	UPROPERTY(Category = "ExportActors", EditAnywhere, meta = (DisplayAfter = bAutoLocateActors))
 	TArray<TObjectPtr<ATilePortalActor>> PortalActors;
 
 	/** Tile bound actors that should be exported. */
-	UPROPERTY(Category = "ExportActors", EditAnywhere)
+	UPROPERTY(Category = "ExportActors", EditAnywhere, meta = (DisplayAfter = bAutoLocateActors))
 	TArray<TObjectPtr<ATileBoundActor>> BoundActors;
+
+	/** Area node actors from which to build a local area graph. */
+	UPROPERTY(Category = "ExportActors", EditAnywhere, meta = (DisplayAfter = bAutoLocateActors))
+	TArray<TObjectPtr<ATileNodeActor>> NodeActors;
 
 	/** True if the export should automatically create a data asset when none is linked. */
 	UPROPERTY(Category = "ExportLevel", EditAnywhere)
 	bool bAutoCreateAsset = true;
+
+	/** True if the export should automatically fill the actor arrays when saved. */
+	UPROPERTY(Category = "ExportActors", EditAnywhere)
+	bool bAutoLocateActors = true;
 
 	ATileDataExport();
 
 private:
 
 	/** Scene component used as the actor root for all builds. */
-	UPROPERTY(BlueprintReadOnly, Category = "ExportSettings", VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "TileExport", VisibleAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<USceneComponent> SceneComponent;
 
 #if WITH_EDITORONLY_DATA

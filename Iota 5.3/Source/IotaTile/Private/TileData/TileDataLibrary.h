@@ -14,7 +14,7 @@ class UTileDataAsset;
 
 /** Provides blueprint functions for tile data types. */
 UCLASS()
-class IOTATILE_API UTileDataLibrary : public UBlueprintFunctionLibrary
+class UTileDataLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

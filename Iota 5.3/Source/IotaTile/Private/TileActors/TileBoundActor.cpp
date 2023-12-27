@@ -1,14 +1,16 @@
 // Copyright Sydney Fonderie. All Rights Reserved.
 
-#include "TileData/TileBoundActor.h"
+#include "TileActors/TileBoundActor.h"
 #include "TileData/TileBound.h"
 #include "Components/BoxComponent.h"
+#include "Engine/CollisionProfile.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TileBoundActor)
 
 ATileBoundActor::ATileBoundActor()
 {
-	SetHidden(true);
+	bIsEditorOnlyActor = true;
+	SetActorHiddenInGame(true);
 	SetCanBeDamaged(false);
 
 	// Define the bounding box subobject.

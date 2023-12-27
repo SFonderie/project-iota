@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "TileData/TileScheme.h"
+#include "TileData/TileNode.h"
 #include "TileData/TileBound.h"
 #include "TileData/TileData.h"
 #include "TileData/TilePortal.h"
+#include "TileData/TileScheme.h"
 #include "GameplayTagContainer.h"
 #include "TileDataAsset.generated.h"
 
 /** Primary data asset type describing a tile level. */
 UCLASS()
-class IOTATILE_API UTileDataAsset : public UPrimaryDataAsset
+class UTileDataAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
@@ -42,4 +43,12 @@ public:
 	/** A list of the tile's collision bounds. */
 	UPROPERTY(Category = "Attributes", EditAnywhere)
 	TArray<FTileBound> Bounds;
+
+	/** A list of the tile's area graph nodes. */
+	UPROPERTY(Category = "Attributes", EditAnywhere)
+	TArray<FTileNode> AreaNodes;
+
+	/** Area graph indices nearest to each portal. */
+	UPROPERTY()
+	TArray<int32> AreaExits;
 };

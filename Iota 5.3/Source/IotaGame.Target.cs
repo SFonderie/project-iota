@@ -11,6 +11,7 @@ public class IotaGameTarget : TargetRules
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
 		bUseUnityBuild = false;
+		bUsePCHFiles = false;
 
 		ExtraModuleNames.Add("IotaGame");
 	}

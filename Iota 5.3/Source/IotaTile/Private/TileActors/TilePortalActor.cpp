@@ -1,18 +1,20 @@
 // Copyright Sydney Fonderie. All Rights Reserved.
 
-#include "TileData/TilePortalActor.h"
+#include "TileActors/TilePortalActor.h"
 #include "TileData/TilePortal.h"
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/ArrowComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/CollisionProfile.h"
 #include "Engine/Texture2D.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(TilePortalActor)
 
 ATilePortalActor::ATilePortalActor()
 {
-	SetHidden(true);
+	bIsEditorOnlyActor = true;
+	SetActorHiddenInGame(true);
 	SetCanBeDamaged(false);
 
 	// Portal plane component is a box component with a collapsed extent.
@@ -36,13 +38,8 @@ ATilePortalActor::ATilePortalActor()
 	struct FConstructorStatics
 	{
 		ConstructorHelpers::FObjectFinderOptional<UTexture2D> SpriteObject;
-		FName ID_TilePortal;
-		FText NAME_TilePortal;
 
-		FConstructorStatics()
-			: SpriteObject(TEXT("/Engine/EditorResources/S_TriggerBox"))
-			, ID_TilePortal("TilePortal")
-			, NAME_TilePortal(NSLOCTEXT("SpriteCategory", "TilePortal", "Tile Portal"))
+		FConstructorStatics() : SpriteObject(TEXT("/Engine/EditorResources/S_TriggerBox"))
 		{
 			// Default constructor.
 		}
@@ -52,33 +49,33 @@ ATilePortalActor::ATilePortalActor()
 
 	// Define the billboard component subobject.
 	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>("HandleSprite");
-	SpriteComponent->Sprite = ConstructorStatics.SpriteObject.Get();
-	SpriteComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
-	SpriteComponent->bIsScreenSizeScaled = true;
 
-	// Set up some other properties for the sprite.
-	SpriteComponent->SpriteInfo.Category = ConstructorStatics.ID_TilePortal;
-	SpriteComponent->SpriteInfo.DisplayName = ConstructorStatics.NAME_TilePortal;
-	SpriteComponent->bHiddenInGame = false;
+	if (IsValid(SpriteComponent))
+	{
+		SpriteComponent->Sprite = ConstructorStatics.SpriteObject.Get();
+		SpriteComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+		SpriteComponent->bIsScreenSizeScaled = true;
+		SpriteComponent->bHiddenInGame = false;
 
-	// Connect the billboard to the plane center.
-	SpriteComponent->SetupAttachment(PlaneComponent);
+		// Connect the billboard to the plane center.
+		SpriteComponent->SetupAttachment(PlaneComponent);
+	}
 
 	// Define the arrow component subobject.
 	ArrowComponent = CreateEditorOnlyDefaultSubobject<UArrowComponent>("DirectionVector");
-	ArrowComponent->ArrowColor = FColor(0, 255, 255, 255);
-	ArrowComponent->bIsScreenSizeScaled = true;
-	ArrowComponent->bTreatAsASprite = true;
-	ArrowComponent->ArrowSize = 0.8f;
 
-	// Set up some other properties for the arrow.
-	ArrowComponent->SpriteInfo.Category = ConstructorStatics.ID_TilePortal;
-	ArrowComponent->SpriteInfo.DisplayName = ConstructorStatics.NAME_TilePortal;
-	ArrowComponent->bHiddenInGame = false;
+	if (IsValid(ArrowComponent))
+	{
+		ArrowComponent->ArrowColor = FColor(0, 255, 255, 255);
+		ArrowComponent->bIsScreenSizeScaled = true;
+		ArrowComponent->bTreatAsASprite = true;
+		ArrowComponent->bHiddenInGame = false;
+		ArrowComponent->ArrowSize = 0.8f;
 
-	// Put the arrow component in position near the sprite.
-	ArrowComponent->SetupAttachment(PlaneComponent);
-	ArrowComponent->SetRelativeLocation(FVector(10, 0, 0));
+		// Put the arrow component in position near the sprite.
+		ArrowComponent->SetupAttachment(PlaneComponent);
+		ArrowComponent->SetRelativeLocation(FVector(10, 0, 0));
+	}
 
 #endif
 }

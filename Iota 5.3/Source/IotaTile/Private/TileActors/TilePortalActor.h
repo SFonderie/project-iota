@@ -13,7 +13,7 @@ class UArrowComponent;
 
 /** Represents a tile portal in the world. */
 UCLASS()
-class IOTATILE_API ATilePortalActor : public AActor
+class ATilePortalActor : public AActor
 {
 	GENERATED_BODY()
 

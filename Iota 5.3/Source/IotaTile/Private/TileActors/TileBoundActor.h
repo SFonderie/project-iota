@@ -11,7 +11,7 @@ class UBoxComponent;
 
 /** Represents a tile collision bound in the world. */
 UCLASS()
-class IOTATILE_API ATileBoundActor : public AActor
+class ATileBoundActor : public AActor
 {
 	GENERATED_BODY()
 
